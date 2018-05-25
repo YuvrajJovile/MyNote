@@ -31,13 +31,14 @@ public class NotesApplication extends Application {
     }
 
 
-    public void setLoginFlag(boolean pLoginFlag) {
+    public void setLoginFlag(String pLoginFlag) {
         mSharedPreferencesEditor = mSharedPreferences.edit();
-        mSharedPreferencesEditor.putBoolean(IN_OUT_KEY, pLoginFlag);
+        mSharedPreferencesEditor.putString(IN_OUT_KEY, pLoginFlag);
         mSharedPreferencesEditor.commit();
     }
 
-    public boolean getLoginDetails() {
-        return mSharedPreferences.getBoolean(IN_OUT_KEY, true);
+    public String getLoginDetails() {
+        return mSharedPreferences.getString(IN_OUT_KEY, "");
+
     }
 }

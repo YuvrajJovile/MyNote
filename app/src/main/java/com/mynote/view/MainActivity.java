@@ -1,9 +1,11 @@
 package com.mynote.view;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +36,8 @@ import static com.mynote.utils.IConstants.DELETE;
 import static com.mynote.utils.IConstants.EDIT;
 import static com.mynote.utils.IConstants.EDIT_OR_CREATE_OR_DELETE;
 import static com.mynote.utils.IConstants.ID_CREATE_OR_EDIT_OR_DELETE;
+import static com.mynote.utils.IConstants.IN;
+import static com.mynote.utils.IConstants.OUT;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -108,22 +112,54 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(this + "", "onClick is called");
             }
 
+            @Override
+            public void onLongPress(View view, int pos) {
+                mSelectedPos = pos;
+                navigateToDelete(mNotesListData.get(pos));
+                Log.d(this + "", "onLong Press is called");
+            }
+
 
         });
 
         mNotesRecycler.addOnItemTouchListener(recyclerTouchListner);
 
-        setWelcomeMessage();
-        validateNotesList();
+        // setWelcomeMessage();
+        // validateNotesList();
+    }
+
+    private void navigateToDelete(final NotesModel pNotesModel) {
+
+
+        final AlertDialog.Builder alBuilder = new AlertDialog.Builder(this);
+
+        alBuilder.setTitle(R.string.delete);
+        alBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new DeleteNotes().doInBackground(pNotesModel);
+            }
+        }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+
+        }).create();
+        alBuilder.show();
+
     }
 
     private void setWelcomeMessage() {
-        if (!NotesApplication.getInstance().getLoginDetails()) {
+        String flag = NotesApplication.getInstance().getLoginDetails();
+        if (flag.isEmpty() || flag.equals(OUT)
+                ) {
             mtvWelcome.setVisibility(View.VISIBLE);
-            NotesApplication.getInstance().setLoginFlag(true);
+            NotesApplication.getInstance().setLoginFlag(IN);
         } else {
             mtvWelcome.setVisibility(View.GONE);
         }
+
     }
 
     private void validateNotesList() {
@@ -144,9 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        setWelcomeMessage();
         validateNotesList();
         super.onResume();
-
     }
 
     private INotesRecyclerListner iNotesRecyclerListner = new INotesRecyclerListner() {
@@ -274,6 +310,32 @@ public class MainActivity extends AppCompatActivity {
 
             mNotesRecyclerAdapter.notifyDataSetChanged();
             validateNotesList();
+        }
+    }
+
+
+    class DeleteNotes extends AsyncTask<NotesModel, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            mProgressBar.setVisibility(View.VISIBLE);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(NotesModel... pNotesModel) {
+            mNotesTable.deleteNotes(pNotesModel[0].getId());
+            mNotesListData.remove(mSelectedPos);
+            mNotesRecyclerAdapter.notifyDataSetChanged();
+            validateNotesList();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mProgressBar.setVisibility(View.GONE);
+            super.onPostExecute(aVoid);
         }
     }
 }

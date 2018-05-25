@@ -4,10 +4,9 @@ public class IConstants {
 
     public static int ID_CREATE_OR_EDIT_OR_DELETE = 100;
 
-    public static boolean IN = true;
+    public static String IN = "logged_in";
     public static String IN_OUT_KEY = "login";
-    public static boolean OUT = false;
-
+    public static String OUT = "logged_out";
 
 
     public static String EDIT = "edit";

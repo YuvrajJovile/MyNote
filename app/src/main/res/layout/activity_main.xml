@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/v_background_lay"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.MainActivity">
 
@@ -34,9 +34,11 @@
         android:layout_above="@id/v_fab_lay"
         android:layout_marginRight="8dp"
         android:layout_toLeftOf="@id/iv_arrow"
+        android:fontFamily="serif"
         android:text="@string/add_notes"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
-        android:textColor="@color/colorWhite" />
+        android:textColor="@color/colorWhite"
+        android:textStyle="italic" />
 
 
     <TextView
@@ -44,9 +46,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:fontFamily="serif"
         android:text="@string/welcome_message"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
-        android:textColor="@color/colorWhite" />
+        android:textColor="@color/colorWhite"
+        android:textStyle="italic" />
 
     <ImageView
         android:id="@+id/iv_arrow"

@@ -103,6 +103,13 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         }
     }
 
+    public interface NotesClickListner {
+        void onClick(View view, int pos);
+
+        void onLongPress(View view, int pos);
+
+    }
+
     public static class RecyclerTouchListner implements RecyclerView.OnItemTouchListener {
 
         private NotesClickListner mNotesClickListner;
@@ -122,6 +129,8 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
                     View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
                     if (child != null && mNotesClickListner != null) {
                         Log.d("RecyclerAdapter", "Long click is called");
+                        int pos = recyclerView.getChildAdapterPosition(child);
+                        mNotesClickListner.onLongPress(child, pos);
                     }
                 }
 
@@ -149,11 +158,6 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
         }
-    }
-
-    public interface NotesClickListner {
-        void onClick(View view, int pos);
-
     }
 
 }
