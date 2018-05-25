@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.AddNotesActivity">
+
+    <ProgressBar
+        android:id="@+id/v_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/et_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
+        android:background="@null"
+        android:ems="10"
+        android:hint="Title"
+        android:imeOptions="actionNext"
+        android:inputType="text|textCapSentences"
+        android:padding="16dp" />
+
+    <EditText
+
+        android:id="@+id/et_discription"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bt_save"
+        android:layout_below="@id/et_title"
+        android:layout_margin="16dp"
+        android:background="@null"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="Description"
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine|textCapSentences"
+        android:padding="16dp" />
+
+    <Button
+        android:id="@+id/bt_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimaryDark"
+        android:padding="16dp"
+        android:text="Save"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>

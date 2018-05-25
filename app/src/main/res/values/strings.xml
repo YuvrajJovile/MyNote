@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MyNote</string>
+    <string name="choose_an_option">Choose an Option</string>
+    <string name="st_three_dot">...</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="add_notes">Add Notes</string>
+    <string name="welcome_message">Welcome to My Notes</string>
+    <string name="preference_file_key">notes_preferences</string>
+</resources>
