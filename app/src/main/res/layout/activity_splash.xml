@@ -7,7 +7,7 @@
     android:id="@+id/tv_splash"
     android:text="@string/app_name"
     android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
-    android:textColor="@color/colorPrimary"
+    android:textColor="@color/colorRed"
     tools:context=".view.SplashActivity">
 
 </TextView>

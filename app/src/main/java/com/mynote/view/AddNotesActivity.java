@@ -2,6 +2,7 @@ package com.mynote.view;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -11,15 +12,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mynote.R;
 import com.mynote.database.NotesTable;
 import com.mynote.database.model.NotesModel;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -35,14 +39,23 @@ import static com.mynote.utils.IConstants.EDIT_OR_CREATE_OR_DELETE;
 public class AddNotesActivity extends AppCompatActivity {
 
     private EditText etTitle, etDescription;
-    private Button btSave;
+
+    private ImageButton mIbDelete, mIbFavorites, mIbRemainder, mIbShare;
+
+    private TextView mtvDateModified;
     private Toast mToast;
     private long mID = -1;
     private ProgressBar mProgressBar;
+    private ImageButton mIbBack;
+
+    private RadioGroup mRgColorGroup;
 
 
     private String flagEditOrCreate = null;
     private NotesTable mNotesTable;
+
+    private boolean flagSwitchFavorites = true;
+    private boolean flagSwitchRemainder = true;
 
 
     @Override
@@ -51,11 +64,26 @@ public class AddNotesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_notes);
         mToast = new Toast(this);
         etTitle = findViewById(R.id.et_title);
-        etDescription = findViewById(R.id.et_discription);
-        btSave = findViewById(R.id.bt_save);
+        etDescription = findViewById(R.id.et_description);
         mProgressBar = findViewById(R.id.v_progress);
-
+        mtvDateModified = findViewById(R.id.tv_date_modified);
+        mIbBack = findViewById(R.id.ib_back);
         mNotesTable = new NotesTable(this);
+
+
+        mIbDelete = findViewById(R.id.ib_delete);
+        mIbFavorites = findViewById(R.id.ib_favourites);
+        mIbRemainder = findViewById(R.id.ib_remainder);
+        mIbShare = findViewById(R.id.ib_share);
+
+        mRgColorGroup = findViewById(R.id.rg_color_group);
+
+        mIbBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
 
         final Bundle bundle = getIntent().getExtras();
@@ -65,64 +93,176 @@ public class AddNotesActivity extends AppCompatActivity {
 
 
             if (flagEditOrCreate.equals(EDIT)) {
-                etTitle.setText(bundle.getString(DATA_TITLE));
+
+                String titleString = bundle.getString(DATA_TITLE);
+                if (titleString.isEmpty() || titleString.length() == 0 || titleString.equals(""))
+                    titleString = "No Title";
+                etTitle.setText(titleString);
                 etDescription.setText(bundle.getString(DATA_DES));
+
+                String dateString = bundle.getString(DATA_DATE);
+                SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMMM \thh:mm a");
+                SimpleDateFormat inputFormat = new SimpleDateFormat("dd:MMM:yyyy \nhh:mm:ss a");
+                try {
+                    Date date = inputFormat.parse(dateString);
+                    dateString = outputFormat.format(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                mtvDateModified.setText("Last modified\t" + dateString);
                 mID = Integer.parseInt(bundle.getString(DATA_ID));
                 Log.d(this + "", "id==" + mID);
             }
         }
 
-        btSave.setOnClickListener(new View.OnClickListener() {
+
+        mIbDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                performDelete();
+            }
+        });
 
-                if (validate()) {
+        mIbShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performShare();
+            }
+        });
 
-                    mProgressBar.setVisibility(View.VISIBLE);
+        mIbFavorites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performOnCLickFavorites();
+            }
+        });
 
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy \nhh:mm:ss a");
+        mIbRemainder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performOnClickRemainder();
+            }
+        });
 
-                    String title = etTitle.getText().toString();
-                    String des = etDescription.getText().toString();
-                    String timeStamp = simpleDateFormat.format(new Date());
-                    String createOrEdit = CREATE;
+        mRgColorGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-
-                    NotesModel notesModel = new NotesModel(mID, title, des, timeStamp);
-
-
-                    Intent intent = new Intent();
-                    Bundle bundleReturn = new Bundle();
-
-
-                    if (flagEditOrCreate.equals(EDIT)) {
-                        new PerformUpdate().doInBackground(notesModel);
-                        createOrEdit = EDIT;
-                    } else {
-                        mID = new PerformInsert().doInBackground(notesModel);
-                    }
-
-
-                    mProgressBar.setVisibility(View.GONE);
-
-
-                    Log.d(this + "", "id==" + mID);
-
-
-                    bundleReturn.putString(EDIT_OR_CREATE_OR_DELETE, createOrEdit);
-                    bundleReturn.putString(DATA_ID, mID + "");
-                    bundleReturn.putString(DATA_TITLE, title);
-                    bundleReturn.putString(DATA_DES, des);
-                    bundleReturn.putString(DATA_DATE, timeStamp);
-                    intent.putExtras(bundleReturn);
-                    setResult(RESULT_OK, intent);
-                    finish();
+                int color = Color.BLACK;
+                switch (checkedId) {
+                    case R.id.rb_green:
+                        color = R.color.colorGreen4DB6AC;
+                        break;
+                    case R.id.rb_green_light:
+                        color = R.color.colorGreenLight81C784;
+                        break;
+                    case R.id.rb_color_blue:
+                        color = R.color.colorBlue4DD0E1;
+                        break;
+                    case R.id.rb_color_violet:
+                        color = R.color.colorVioletBA68C8;
+                        break;
+                    case R.id.rb_color_pink:
+                        color = R.color.colorPinkF06292;
+                        break;
+                    case R.id.rb_color_orange:
+                        color = R.color.colorOrrange;
+                        break;
                 }
+
+                etDescription.setTextColor(getResources().getColor(color));
+
             }
         });
 
     }
 
+    private void performOnClickRemainder() {
+
+        if (flagSwitchRemainder) {
+            mIbRemainder.setSelected(true);
+        } else {
+            mIbRemainder.setSelected(false);
+        }
+
+        flagSwitchRemainder = flagSwitchRemainder != true;
+    }
+
+    private void performOnCLickFavorites() {
+
+        if (flagSwitchFavorites) {
+            mIbFavorites.setSelected(true);
+        } else {
+            mIbFavorites.setSelected(false);
+        }
+
+        flagSwitchFavorites = flagSwitchFavorites != true;
+
+    }
+
+    private void performShare() {
+
+        String dataToShare = "Hi there, Check this out:-\nTitle: " + etTitle.getText().toString() + "\nDescription: " + etDescription.getText().toString();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, dataToShare);
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        if (validate()) {
+
+            mProgressBar.setVisibility(View.VISIBLE);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy \nhh:mm:ss a");
+
+
+            String title = etTitle.getText().toString();
+
+            if (title.isEmpty() || title.length() == 0 || title.equals(""))
+                title = "No Title";
+            String des = etDescription.getText().toString();
+            String timeStamp = simpleDateFormat.format(new Date());
+            String createOrEdit = CREATE;
+
+
+            NotesModel notesModel = new NotesModel(mID, title, des, timeStamp);
+
+
+            Intent intent = new Intent();
+            Bundle bundleReturn = new Bundle();
+
+
+            if (flagEditOrCreate.equals(EDIT)) {
+                new PerformUpdate().doInBackground(notesModel);
+                createOrEdit = EDIT;
+            } else {
+                mID = new PerformInsert().doInBackground(notesModel);
+            }
+
+
+            mProgressBar.setVisibility(View.GONE);
+
+
+            Log.d(this + "", "id==" + mID);
+
+
+            bundleReturn.putString(EDIT_OR_CREATE_OR_DELETE, createOrEdit);
+            bundleReturn.putString(DATA_ID, mID + "");
+            bundleReturn.putString(DATA_TITLE, title);
+            bundleReturn.putString(DATA_DES, des);
+            bundleReturn.putString(DATA_DATE, timeStamp);
+            intent.putExtras(bundleReturn);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,10 +307,12 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private boolean validate() {
 
-        if (etTitle.getText().toString().length() <= 0) {
+       /* if (etTitle.getText().toString().length() <= 0) {
             showMessage("Enter a Title");
             return false;
-        } else if (etDescription.getText().toString().length() <= 0) {
+        } else
+            */
+        if (etDescription.getText().toString().length() <= 0) {
             showMessage("Enter a description");
             return false;
         }

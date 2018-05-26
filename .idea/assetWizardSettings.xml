@@ -28,9 +28,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_arrow" />
+                            <entry key="color" value="d32f2f" />
+                            <entry key="outputName" value="ic_delete" />
                             <entry key="sourceFile" value="C:\Users\User.FULL478-WIN\Downloads\icon.svg" />
                           </map>
                         </option>

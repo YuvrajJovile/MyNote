@@ -2,6 +2,7 @@ package com.mynote.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -9,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mynote.R;
@@ -58,7 +58,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         private INotesRecyclerListner mINotesRecyclerListner;
         private TextView tvTitle, tvDescription;
         private TextView tvDate;
-        private RelativeLayout mLayout;
+        private CardView mLayout;
 
         public NotesRecyclerViewHolder(View itemView, INotesRecyclerListner mINotesRecyclerListner) {
             super(itemView);
@@ -73,7 +73,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         public void populateData(NotesModel notesModel) {
             this.mNotesModel = notesModel;
 
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMMM  \nhh:mm a");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy \thh:mm a");
             SimpleDateFormat inputFormat = new SimpleDateFormat("dd:MMM:yyyy \nhh:mm:ss a");
 
 

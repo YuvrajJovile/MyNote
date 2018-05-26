@@ -9,4 +9,8 @@
     <string name="add_notes">Add Notes</string>
     <string name="welcome_message">Welcome to My Notes</string>
     <string name="preference_file_key">notes_preferences</string>
+
+    <string name="title">Title</string>
+    <string name="des">Description</string>
+    <string name="select_color">Select Color</string>
 </resources>

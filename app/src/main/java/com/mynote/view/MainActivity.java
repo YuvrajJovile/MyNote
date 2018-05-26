@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
         mtvWelcome = findViewById(R.id.tv_welcome);
         mBackgroundLay = findViewById(R.id.v_background_lay);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mNotesRecycler.setLayoutManager(linearLayoutManager);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        mNotesRecycler.setLayoutManager(gridLayoutManager);
         mFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
