@@ -1,6 +1,7 @@
 package com.mynote.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -91,6 +92,11 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 
             tvDate.setText(dateString);
 
+            try {
+                mLayout.setCardBackgroundColor(Color.parseColor(notesModel.getColor()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         @Override

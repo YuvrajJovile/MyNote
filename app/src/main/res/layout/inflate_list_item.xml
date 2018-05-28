@@ -4,9 +4,9 @@
     android:id="@+id/v_layout"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:layout_margin="0.5dp"
+    android:layout_margin="6dp"
     android:background="@color/colorWhite"
-    app:cardCornerRadius="0dp">
+    app:cardCornerRadius="4dp">
 
 
     <LinearLayout
@@ -55,7 +55,7 @@
             android:padding="4dp"
             android:text="Date"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorGrey" />
+            android:textColor="@color/colorGreyDark" />
     </LinearLayout>
 
 

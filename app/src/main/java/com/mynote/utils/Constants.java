@@ -1,6 +1,6 @@
 package com.mynote.utils;
 
-public class IConstants {
+public class Constants {
 
     public static int ID_CREATE_OR_EDIT_OR_DELETE = 100;
 
@@ -33,5 +33,25 @@ public class IConstants {
     public static String COLUMN_NOTE_TITLE = "note_title";
     public static String COLUMN_NOTE_DESRIPTION = "note_description";
     public static String COLUMN_TIMESTAMP = "timestamp";
+    public static String COLUMN_COLOR = "color";
+    public static String COLUMN_CREATED_OR_MODIFIED = "created_or_modified";
+
+
+    public static String CHORD_COLOR = "chord_color";
+
+    public static String COLOR_DEFAULT = "#ffffff";
+
+    public static String COLOR_GREEN = "#4DB6AC";
+    public static String COLOR_GREEN_LIGHT = "#81C784";
+    public static String COLOR_BLUE = "#4DD0E1";
+    public static String COLOR_VIOLET = "#BA68C8";
+    public static String COLOR_PINK = "#F06292";
+    public static String COLOR_ORANGE = "#FF8A65";
+    public static String COLOR_GREY = "#acacac";
+
+    public static String CREATED = "created";
+    public static String MODIFIED = "modified";
+
+
 
 }

@@ -27,14 +27,25 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.mynote.utils.IConstants.CREATE;
-import static com.mynote.utils.IConstants.DATA_DATE;
-import static com.mynote.utils.IConstants.DATA_DES;
-import static com.mynote.utils.IConstants.DATA_ID;
-import static com.mynote.utils.IConstants.DATA_TITLE;
-import static com.mynote.utils.IConstants.DELETE;
-import static com.mynote.utils.IConstants.EDIT;
-import static com.mynote.utils.IConstants.EDIT_OR_CREATE_OR_DELETE;
+import static com.mynote.utils.Constants.CHORD_COLOR;
+import static com.mynote.utils.Constants.COLOR_BLUE;
+import static com.mynote.utils.Constants.COLOR_DEFAULT;
+import static com.mynote.utils.Constants.COLOR_GREEN;
+import static com.mynote.utils.Constants.COLOR_GREEN_LIGHT;
+import static com.mynote.utils.Constants.COLOR_ORANGE;
+import static com.mynote.utils.Constants.COLOR_PINK;
+import static com.mynote.utils.Constants.COLOR_VIOLET;
+import static com.mynote.utils.Constants.COLUMN_CREATED_OR_MODIFIED;
+import static com.mynote.utils.Constants.CREATE;
+import static com.mynote.utils.Constants.CREATED;
+import static com.mynote.utils.Constants.DATA_DATE;
+import static com.mynote.utils.Constants.DATA_DES;
+import static com.mynote.utils.Constants.DATA_ID;
+import static com.mynote.utils.Constants.DATA_TITLE;
+import static com.mynote.utils.Constants.DELETE;
+import static com.mynote.utils.Constants.EDIT;
+import static com.mynote.utils.Constants.EDIT_OR_CREATE_OR_DELETE;
+import static com.mynote.utils.Constants.MODIFIED;
 
 public class AddNotesActivity extends AppCompatActivity {
 
@@ -56,6 +67,9 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private boolean flagSwitchFavorites = true;
     private boolean flagSwitchRemainder = true;
+
+    private String mChordColor = COLOR_DEFAULT;
+    private String mCreatedOrModified = CREATED;
 
 
     @Override
@@ -99,6 +113,37 @@ public class AddNotesActivity extends AppCompatActivity {
                     titleString = "No Title";
                 etTitle.setText(titleString);
                 etDescription.setText(bundle.getString(DATA_DES));
+                mChordColor = bundle.getString(CHORD_COLOR);
+                mCreatedOrModified = bundle.getString(COLUMN_CREATED_OR_MODIFIED);
+
+                int id = -1;
+
+                if (mChordColor.equals(COLOR_DEFAULT)) {
+                    id = 0;
+                } else if (mChordColor.equals(COLOR_GREEN)) {
+                    id = R.id.rb_green;
+                } else if (mChordColor.equals(COLOR_GREEN_LIGHT)) {
+                    id = R.id.rb_green_light;
+                } else if (mChordColor.equals(COLOR_BLUE)) {
+                    id = R.id.rb_color_blue;
+                } else if (mChordColor.equals(COLOR_VIOLET)) {
+                    id = R.id.rb_color_violet;
+                } else if (mChordColor.equals(COLOR_PINK)) {
+                    id = R.id.rb_color_pink;
+                } else if (mChordColor.equals(COLOR_ORANGE)) {
+                    id = R.id.rb_color_orange;
+                }
+
+
+                if (id != 0)
+                    mRgColorGroup.check(id);
+
+                try {
+                    etDescription.setBackgroundColor(Color.parseColor(mChordColor));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
 
                 String dateString = bundle.getString(DATA_DATE);
                 SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMMM \thh:mm a");
@@ -109,73 +154,96 @@ public class AddNotesActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                mtvDateModified.setText("Last modified\t" + dateString);
+
+                String modifiedTitle = ((mCreatedOrModified.equals(MODIFIED)) ? getString(R.string.last_modified) : getString(R.string.created_at)) + dateString;
+                mtvDateModified.setText(modifiedTitle);
                 mID = Integer.parseInt(bundle.getString(DATA_ID));
                 Log.d(this + "", "id==" + mID);
             }
         }
 
 
-        mIbDelete.setOnClickListener(new View.OnClickListener() {
+        mIbDelete.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 performDelete();
             }
         });
 
-        mIbShare.setOnClickListener(new View.OnClickListener() {
+        mIbShare.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 performShare();
             }
         });
 
-        mIbFavorites.setOnClickListener(new View.OnClickListener() {
+        mIbFavorites.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 performOnCLickFavorites();
             }
         });
 
-        mIbRemainder.setOnClickListener(new View.OnClickListener() {
+        mIbRemainder.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 performOnClickRemainder();
             }
         });
 
-        mRgColorGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mRgColorGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+
+        {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-                int color = Color.BLACK;
+
                 switch (checkedId) {
                     case R.id.rb_green:
-                        color = R.color.colorGreen4DB6AC;
+
+                        mChordColor = COLOR_GREEN;
                         break;
                     case R.id.rb_green_light:
-                        color = R.color.colorGreenLight81C784;
+
+                        mChordColor = COLOR_GREEN_LIGHT;
                         break;
                     case R.id.rb_color_blue:
-                        color = R.color.colorBlue4DD0E1;
+
+                        mChordColor = COLOR_BLUE;
                         break;
                     case R.id.rb_color_violet:
-                        color = R.color.colorVioletBA68C8;
+
+                        mChordColor = COLOR_VIOLET;
                         break;
                     case R.id.rb_color_pink:
-                        color = R.color.colorPinkF06292;
+
+                        mChordColor = COLOR_PINK;
                         break;
                     case R.id.rb_color_orange:
-                        color = R.color.colorOrrange;
+
+                        mChordColor = COLOR_ORANGE;
                         break;
                 }
+                try {
+                    etDescription.setBackgroundColor(Color.parseColor(mChordColor));
 
-                etDescription.setTextColor(getResources().getColor(color));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
         });
 
     }
+
 
     private void performOnClickRemainder() {
 
@@ -202,7 +270,7 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private void performShare() {
 
-        String dataToShare = "Hi there, Check this out:-\nTitle: " + etTitle.getText().toString() + "\nDescription: " + etDescription.getText().toString();
+        String dataToShare = getString(R.string.share_title) + etTitle.getText().toString() + getString(R.string.share_description) + etDescription.getText().toString();
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, dataToShare);
@@ -223,15 +291,13 @@ public class AddNotesActivity extends AppCompatActivity {
 
 
             String title = etTitle.getText().toString();
-
-            if (title.isEmpty() || title.length() == 0 || title.equals(""))
-                title = "No Title";
+            title = title.isEmpty() || title.equals("") ? getString(R.string.no_title) : title;
             String des = etDescription.getText().toString();
             String timeStamp = simpleDateFormat.format(new Date());
             String createOrEdit = CREATE;
 
 
-            NotesModel notesModel = new NotesModel(mID, title, des, timeStamp);
+            NotesModel notesModel;
 
 
             Intent intent = new Intent();
@@ -239,9 +305,13 @@ public class AddNotesActivity extends AppCompatActivity {
 
 
             if (flagEditOrCreate.equals(EDIT)) {
+                mCreatedOrModified = MODIFIED;
+                notesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified);
                 new PerformUpdate().doInBackground(notesModel);
                 createOrEdit = EDIT;
             } else {
+                mCreatedOrModified = CREATED;
+                notesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified);
                 mID = new PerformInsert().doInBackground(notesModel);
             }
 
@@ -257,6 +327,8 @@ public class AddNotesActivity extends AppCompatActivity {
             bundleReturn.putString(DATA_TITLE, title);
             bundleReturn.putString(DATA_DES, des);
             bundleReturn.putString(DATA_DATE, timeStamp);
+            bundleReturn.putString(CHORD_COLOR, mChordColor);
+            bundleReturn.putString(COLUMN_CREATED_OR_MODIFIED, mCreatedOrModified);
             intent.putExtras(bundleReturn);
             setResult(RESULT_OK, intent);
             finish();
@@ -307,13 +379,8 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private boolean validate() {
 
-       /* if (etTitle.getText().toString().length() <= 0) {
-            showMessage("Enter a Title");
-            return false;
-        } else
-            */
         if (etDescription.getText().toString().length() <= 0) {
-            showMessage("Enter a description");
+            showMessage(getString(R.string.enter_a_description));
             return false;
         }
         return true;
@@ -390,6 +457,7 @@ public class AddNotesActivity extends AppCompatActivity {
         protected void onPostExecute(Long aLong) {
             mProgressBar.setVisibility(View.GONE);
         }
+
     }
 
     private void navigateToMain() {

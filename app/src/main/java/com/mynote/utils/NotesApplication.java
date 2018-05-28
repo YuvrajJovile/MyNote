@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import static com.mynote.utils.IConstants.IN_OUT_KEY;
+import static com.mynote.utils.Constants.IN_OUT_KEY;
 
 public class NotesApplication extends Application {
 

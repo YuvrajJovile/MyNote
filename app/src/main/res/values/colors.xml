@@ -9,6 +9,7 @@
     <color name="colorGrey">#aaaaaa</color>
     <color name="colorGreyDark">#616161</color>
     <color name="colorRed">#f44336</color>
+    <color name="colorRedTransparent">#99f44336</color>
     <color name="colorRedDark">#c62828</color>
 
 

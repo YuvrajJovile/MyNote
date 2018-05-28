@@ -5,7 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import static com.mynote.utils.IConstants.*;
+import static com.mynote.utils.Constants.MAIN_DATABASE_NAME;
+import static com.mynote.utils.Constants.MAIN_DATABASE_VERSION;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 

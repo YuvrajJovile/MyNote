@@ -7,6 +7,9 @@ public class NotesModel {
     private String description;
     private String date;
 
+    private String color;
+    private String createdOrModified;
+
 
     public NotesModel() {
     }
@@ -17,11 +20,13 @@ public class NotesModel {
         this.date = date;
     }
 
-    public NotesModel(long id, String title, String description, String date) {
+    public NotesModel(long id, String title, String description, String date, String color, String createdOrModified) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.date = date;
+        this.color = color;
+        this.createdOrModified = createdOrModified;
     }
 
 
@@ -55,5 +60,22 @@ public class NotesModel {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getCreatedOrModified() {
+        return createdOrModified;
+    }
+
+    public void setCreatedOrModified(String createdOrModified) {
+        this.createdOrModified = createdOrModified;
     }
 }

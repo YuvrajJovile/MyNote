@@ -2,6 +2,7 @@ package com.mynote.view;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,17 +28,20 @@ import com.mynote.utils.NotesApplication;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mynote.utils.IConstants.CREATE;
-import static com.mynote.utils.IConstants.DATA_DATE;
-import static com.mynote.utils.IConstants.DATA_DES;
-import static com.mynote.utils.IConstants.DATA_ID;
-import static com.mynote.utils.IConstants.DATA_TITLE;
-import static com.mynote.utils.IConstants.DELETE;
-import static com.mynote.utils.IConstants.EDIT;
-import static com.mynote.utils.IConstants.EDIT_OR_CREATE_OR_DELETE;
-import static com.mynote.utils.IConstants.ID_CREATE_OR_EDIT_OR_DELETE;
-import static com.mynote.utils.IConstants.IN;
-import static com.mynote.utils.IConstants.OUT;
+import static com.mynote.utils.Constants.CHORD_COLOR;
+import static com.mynote.utils.Constants.COLOR_GREY;
+import static com.mynote.utils.Constants.COLUMN_CREATED_OR_MODIFIED;
+import static com.mynote.utils.Constants.CREATE;
+import static com.mynote.utils.Constants.DATA_DATE;
+import static com.mynote.utils.Constants.DATA_DES;
+import static com.mynote.utils.Constants.DATA_ID;
+import static com.mynote.utils.Constants.DATA_TITLE;
+import static com.mynote.utils.Constants.DELETE;
+import static com.mynote.utils.Constants.EDIT;
+import static com.mynote.utils.Constants.EDIT_OR_CREATE_OR_DELETE;
+import static com.mynote.utils.Constants.ID_CREATE_OR_EDIT_OR_DELETE;
+import static com.mynote.utils.Constants.IN;
+import static com.mynote.utils.Constants.OUT;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -155,33 +159,35 @@ public class MainActivity extends AppCompatActivity {
         if (flag.isEmpty() || flag.equals(OUT)
                 ) {
             mtvWelcome.setVisibility(View.VISIBLE);
-            NotesApplication.getInstance().setLoginFlag(IN);
-        } else {
-            mtvWelcome.setVisibility(View.GONE);
-        }
-
-    }
-
-    private void validateNotesList() {
-        if (mNotesListData.size() < 1) {
-
             mAddNotesText.setVisibility(View.VISIBLE);
             mAddNotesImageView.setVisibility(View.VISIBLE);
             mBlinkLayout.setBackground(getDrawable(R.drawable.show_case_drawable));
-            mBackgroundLay.setBackgroundResource(R.color.colorPrimaryTransparent);
+            mBackgroundLay.setBackgroundResource(R.color.colorRedTransparent);
+            NotesApplication.getInstance().setLoginFlag(IN);
         } else {
+
             mAddNotesText.setVisibility(View.GONE);
             mAddNotesImageView.setVisibility(View.GONE);
             mBlinkLayout.setBackground(null);
             mBackgroundLay.setBackgroundResource(0);
 
+
+            if (mNotesListData.size() < 1) {
+                mtvWelcome.setVisibility(View.VISIBLE);
+                mtvWelcome.setText(getString(R.string.add_notes));
+                mtvWelcome.setTextColor(Color.parseColor(COLOR_GREY));
+            } else {
+                mtvWelcome.setVisibility(View.GONE);
+            }
         }
+
     }
+
+
 
     @Override
     protected void onResume() {
         setWelcomeMessage();
-        validateNotesList();
         super.onResume();
     }
 
@@ -202,6 +208,8 @@ public class MainActivity extends AppCompatActivity {
         bundle.putString(DATA_DES, pData.getDescription());
         bundle.putString(DATA_DATE, pData.getDate());
         bundle.putString(DATA_ID, pData.getId() + "");
+        bundle.putString(CHORD_COLOR, pData.getColor());
+        bundle.putString(COLUMN_CREATED_OR_MODIFIED, pData.getCreatedOrModified());
         intent.putExtras(bundle);
         startActivityForResult(intent, ID_CREATE_OR_EDIT_OR_DELETE);
 
@@ -272,6 +280,8 @@ public class MainActivity extends AppCompatActivity {
                 notesModel.setTitle(resultBundle.getString(DATA_TITLE));
                 notesModel.setDescription(resultBundle.getString(DATA_DES));
                 notesModel.setDate(resultBundle.getString(DATA_DATE));
+                notesModel.setColor(resultBundle.getString(CHORD_COLOR));
+                notesModel.setCreatedOrModified(resultBundle.getString(COLUMN_CREATED_OR_MODIFIED));
 
                 if (createOrEdit.equals(EDIT) && id != -1) {
 
@@ -309,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             mNotesRecyclerAdapter.notifyDataSetChanged();
-            validateNotesList();
+            setWelcomeMessage();
         }
     }
 
@@ -328,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
             mNotesTable.deleteNotes(pNotesModel[0].getId());
             mNotesListData.remove(mSelectedPos);
             mNotesRecyclerAdapter.notifyDataSetChanged();
-            validateNotesList();
+            setWelcomeMessage();
             return null;
         }
 
