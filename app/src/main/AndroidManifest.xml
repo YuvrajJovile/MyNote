@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mynote">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:name=".utils.NotesApplication"
         android:allowBackup="true"
@@ -21,13 +23,21 @@
         <activity
             android:name=".view.AddNotesActivity"
             android:parentActivityName=".view.MainActivity"
-            android:singleUser="true" />
+            android:screenOrientation="portrait"
+            android:singleUser="true"
+            android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".view.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.RemainderService"
+            android:enabled="true" />
+        <receiver android:name=".broadcast.RemainderBroadcast" />
+
     </application>
 
 </manifest>

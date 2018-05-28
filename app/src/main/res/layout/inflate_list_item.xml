@@ -17,8 +17,10 @@
         android:orientation="vertical">
 
         <TextView
+
+            android:layout_width="match_parent"
             android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
+            android:drawableRight="@drawable/ic_favorite_unselected"
             android:layout_height="0dp"
             android:layout_margin="8dp"
             android:layout_weight="0.1"
@@ -37,7 +39,7 @@
             android:layout_margin="8dp"
             android:layout_weight="0.3"
             android:ellipsize="end"
-            android:maxLines="3"
+            android:maxLines="5"
             android:text="Description"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
             android:textColor="@color/colorGreyDark" />
@@ -49,13 +51,14 @@
             android:layout_height="0dp"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:layout_weight="0.1"
+            android:layout_weight="0.15"
             android:gravity="bottom|right"
-            android:maxLines="1"
+            android:maxLines="2"
             android:padding="4dp"
             android:text="Date"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorGreyDark" />
+            android:textColor="@color/colorGreyDark"
+            android:textSize="10sp" />
     </LinearLayout>
 
 

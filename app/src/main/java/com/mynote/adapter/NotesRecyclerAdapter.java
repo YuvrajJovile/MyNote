@@ -22,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static com.mynote.utils.Constants.MODIFIED;
+
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.NotesRecyclerViewHolder> {
 
     public List<NotesModel> mDataList;
@@ -75,22 +77,29 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
             this.mNotesModel = notesModel;
 
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy \thh:mm a");
-            SimpleDateFormat inputFormat = new SimpleDateFormat("dd:MMM:yyyy \nhh:mm:ss a");
+            SimpleDateFormat inputFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a");
 
 
             tvTitle.setText(notesModel.getTitle());
+
+
+            tvTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, notesModel.isFavourite() ? R.drawable.ic_favorite_selected :
+                    R.drawable.ic_favorite_unselected, 0);
+
+
             tvDescription.setText(notesModel.getDescription());
 
-            String dateString = "";
+            String dateString = (notesModel.getCreatedOrModified().equals(MODIFIED)) ? itemView.getContext().getString(R.string.last_modified) :
+                    itemView.getContext().getString(R.string.created_at);
+
             try {
                 Date date = inputFormat.parse(notesModel.getDate());
-                dateString = outputFormat.format(date);
+                dateString += outputFormat.format(date);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-
-            tvDate.setText(dateString);
+            tvDate.setText(dateString.toUpperCase());
 
             try {
                 mLayout.setCardBackgroundColor(Color.parseColor(notesModel.getColor()));

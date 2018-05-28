@@ -10,6 +10,10 @@ public class NotesModel {
     private String color;
     private String createdOrModified;
 
+    private boolean favourite;
+
+    private long remainderTime;
+
 
     public NotesModel() {
     }
@@ -20,13 +24,17 @@ public class NotesModel {
         this.date = date;
     }
 
-    public NotesModel(long id, String title, String description, String date, String color, String createdOrModified) {
+    public NotesModel(long id, String title, String description,
+                      String date, String color, String createdOrModified
+            , boolean favorite, long remainderTime) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.date = date;
         this.color = color;
         this.createdOrModified = createdOrModified;
+        this.favourite = favorite;
+        this.remainderTime = remainderTime;
     }
 
 
@@ -77,5 +85,22 @@ public class NotesModel {
 
     public void setCreatedOrModified(String createdOrModified) {
         this.createdOrModified = createdOrModified;
+    }
+
+
+    public boolean isFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
+    }
+
+    public long getRemainderTime() {
+        return remainderTime;
+    }
+
+    public void setRemainderTime(long remainderTime) {
+        this.remainderTime = remainderTime;
     }
 }

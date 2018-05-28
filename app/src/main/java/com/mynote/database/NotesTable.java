@@ -13,9 +13,11 @@ import java.util.List;
 
 import static com.mynote.utils.Constants.COLUMN_COLOR;
 import static com.mynote.utils.Constants.COLUMN_CREATED_OR_MODIFIED;
+import static com.mynote.utils.Constants.COLUMN_FAVORITE;
 import static com.mynote.utils.Constants.COLUMN_ID;
 import static com.mynote.utils.Constants.COLUMN_NOTE_DESRIPTION;
 import static com.mynote.utils.Constants.COLUMN_NOTE_TITLE;
+import static com.mynote.utils.Constants.COLUMN_REMAINDER_TIME;
 import static com.mynote.utils.Constants.COLUMN_TIMESTAMP;
 import static com.mynote.utils.Constants.TABLE_NAME;
 
@@ -44,7 +46,9 @@ public class NotesTable {
                     + COLUMN_NOTE_DESRIPTION + " TEXT,"
                     + COLUMN_TIMESTAMP + " TEXT,"
                     + COLUMN_COLOR + " TEXT,"
-                    + COLUMN_CREATED_OR_MODIFIED + " TEXT"
+                    + COLUMN_CREATED_OR_MODIFIED + " TEXT,"
+                    + COLUMN_FAVORITE + " TEXT,"
+                    + COLUMN_REMAINDER_TIME + " TEXT"
                     + ")";
 
     public static void createTable(SQLiteDatabase db) {
@@ -62,6 +66,8 @@ public class NotesTable {
         values.put(COLUMN_TIMESTAMP, pNotesModel.getDate());
         values.put(COLUMN_COLOR, pNotesModel.getColor());
         values.put(COLUMN_CREATED_OR_MODIFIED, pNotesModel.getCreatedOrModified());
+        values.put(COLUMN_FAVORITE, pNotesModel.isFavourite() + "");
+        values.put(COLUMN_REMAINDER_TIME, pNotesModel.getRemainderTime());
 
         long id = lSqLiteDatabase.insert(TABLE_NAME, null, values);
         lSqLiteDatabase.close();
@@ -80,7 +86,9 @@ public class NotesTable {
                 COLUMN_NOTE_DESRIPTION,
                 COLUMN_TIMESTAMP,
                 COLUMN_COLOR,
-                COLUMN_CREATED_OR_MODIFIED
+                COLUMN_CREATED_OR_MODIFIED,
+                COLUMN_FAVORITE,
+                COLUMN_REMAINDER_TIME
         };
 
         String selection = COLUMN_ID + " = ?";
@@ -103,7 +111,9 @@ public class NotesTable {
                 cursor.getString(cursor.getColumnIndex(COLUMN_NOTE_DESRIPTION)),
                 cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)),
                 cursor.getString(cursor.getColumnIndex(COLUMN_COLOR)),
-                cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)));
+                cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)),
+                Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(COLUMN_FAVORITE))),
+                Long.parseLong(cursor.getString(cursor.getColumnIndex(COLUMN_REMAINDER_TIME))));
         cursor.close();
 
 
@@ -132,6 +142,8 @@ public class NotesTable {
                 lNotesModel.setDate(cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
                 lNotesModel.setColor(cursor.getString(cursor.getColumnIndex(COLUMN_COLOR)));
                 lNotesModel.setCreatedOrModified(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)));
+                lNotesModel.setFavourite(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(COLUMN_FAVORITE))));
+                lNotesModel.setRemainderTime(Long.parseLong(cursor.getString(cursor.getColumnIndex(COLUMN_REMAINDER_TIME))));
 
                 lNotesModels.add(lNotesModel);
             } while (cursor.moveToNext());
@@ -165,6 +177,8 @@ public class NotesTable {
         values.put(COLUMN_TIMESTAMP, pNotesModel.getDate());
         values.put(COLUMN_COLOR, pNotesModel.getColor());
         values.put(COLUMN_CREATED_OR_MODIFIED, pNotesModel.getCreatedOrModified());
+        values.put(COLUMN_FAVORITE, pNotesModel.isFavourite() + "");
+        values.put(COLUMN_REMAINDER_TIME, pNotesModel.getRemainderTime());
 
         String selection = COLUMN_ID + " = ? ";
         String[] selectionArgs = {pNotesModel.getId() + ""};

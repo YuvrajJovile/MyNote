@@ -31,6 +31,8 @@ import java.util.List;
 import static com.mynote.utils.Constants.CHORD_COLOR;
 import static com.mynote.utils.Constants.COLOR_GREY;
 import static com.mynote.utils.Constants.COLUMN_CREATED_OR_MODIFIED;
+import static com.mynote.utils.Constants.COLUMN_FAVORITE;
+import static com.mynote.utils.Constants.COLUMN_REMAINDER_TIME;
 import static com.mynote.utils.Constants.CREATE;
 import static com.mynote.utils.Constants.DATA_DATE;
 import static com.mynote.utils.Constants.DATA_DES;
@@ -41,7 +43,9 @@ import static com.mynote.utils.Constants.EDIT;
 import static com.mynote.utils.Constants.EDIT_OR_CREATE_OR_DELETE;
 import static com.mynote.utils.Constants.ID_CREATE_OR_EDIT_OR_DELETE;
 import static com.mynote.utils.Constants.IN;
+import static com.mynote.utils.Constants.LANDSCAPE;
 import static com.mynote.utils.Constants.OUT;
+import static com.mynote.utils.Constants.POTRAIT;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -82,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
         mtvWelcome = findViewById(R.id.tv_welcome);
         mBackgroundLay = findViewById(R.id.v_background_lay);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-        mNotesRecycler.setLayoutManager(gridLayoutManager);
+
         mFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,36 +104,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "data ==" + mNotesListData.get(i).getId());
         }
 
-
-        mProgressBar.setVisibility(View.VISIBLE);
-        mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotesListData, iNotesRecyclerListner);
-        mNotesRecycler.setAdapter(mNotesRecyclerAdapter);
-        mProgressBar.setVisibility(View.GONE);
-
-
-        NotesRecyclerAdapter.RecyclerTouchListner recyclerTouchListner = new NotesRecyclerAdapter.RecyclerTouchListner(this, mNotesRecycler, new NotesRecyclerAdapter.NotesClickListner() {
-            @Override
-            public void onClick(View view, int pos) {
-                mSelectedPos = pos;
-                navigateToEdit(mNotesListData.get(pos));
-                Log.d(this + "", "onClick is called");
-            }
-
-            @Override
-            public void onLongPress(View view, int pos) {
-                mSelectedPos = pos;
-                navigateToDelete(mNotesListData.get(pos));
-                Log.d(this + "", "onLong Press is called");
-            }
-
-
-        });
-
-        mNotesRecycler.addOnItemTouchListener(recyclerTouchListner);
-
-        // setWelcomeMessage();
-        // validateNotesList();
     }
+
 
     private void navigateToDelete(final NotesModel pNotesModel) {
 
@@ -184,11 +159,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onResume() {
         setWelcomeMessage();
+
+        setOrientation();
+
         super.onResume();
+    }
+
+    private void setOrientation() {
+
+        int orientation = getResources().getConfiguration().orientation;
+
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+
+        if (orientation == POTRAIT) {
+            gridLayoutManager = new GridLayoutManager(this, 2);
+        } else if (orientation == LANDSCAPE) {
+            gridLayoutManager = new GridLayoutManager(this, 4);
+        }
+
+        mNotesRecycler.setLayoutManager(gridLayoutManager);
+
+
+        if (mNotesRecyclerAdapter == null) {
+            mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotesListData, iNotesRecyclerListner);
+            mNotesRecycler.setAdapter(mNotesRecyclerAdapter);
+            NotesRecyclerAdapter.RecyclerTouchListner recyclerTouchListner = new NotesRecyclerAdapter.RecyclerTouchListner(MainActivity.this, mNotesRecycler, new NotesRecyclerAdapter.NotesClickListner() {
+                @Override
+                public void onClick(View view, int pos) {
+                    mSelectedPos = pos;
+                    navigateToEdit(mNotesListData.get(pos));
+                    Log.d(this + "", "onClick is called");
+                }
+
+                @Override
+                public void onLongPress(View view, int pos) {
+                    mSelectedPos = pos;
+                    navigateToDelete(mNotesListData.get(pos));
+                    Log.d(this + "", "onLong Press is called");
+                }
+
+
+            });
+            mNotesRecycler.addOnItemTouchListener(recyclerTouchListner);
+        }
+
     }
 
     private INotesRecyclerListner iNotesRecyclerListner = new INotesRecyclerListner() {
@@ -210,6 +228,8 @@ public class MainActivity extends AppCompatActivity {
         bundle.putString(DATA_ID, pData.getId() + "");
         bundle.putString(CHORD_COLOR, pData.getColor());
         bundle.putString(COLUMN_CREATED_OR_MODIFIED, pData.getCreatedOrModified());
+        bundle.putString(COLUMN_FAVORITE, pData.isFavourite() + "");
+        bundle.putString(COLUMN_REMAINDER_TIME, pData.getRemainderTime() + "");
         intent.putExtras(bundle);
         startActivityForResult(intent, ID_CREATE_OR_EDIT_OR_DELETE);
 
@@ -282,6 +302,8 @@ public class MainActivity extends AppCompatActivity {
                 notesModel.setDate(resultBundle.getString(DATA_DATE));
                 notesModel.setColor(resultBundle.getString(CHORD_COLOR));
                 notesModel.setCreatedOrModified(resultBundle.getString(COLUMN_CREATED_OR_MODIFIED));
+                notesModel.setFavourite(Boolean.parseBoolean(resultBundle.getString(COLUMN_FAVORITE)));
+                notesModel.setRemainderTime(Long.parseLong(resultBundle.getString(COLUMN_REMAINDER_TIME)));
 
                 if (createOrEdit.equals(EDIT) && id != -1) {
 

@@ -12,11 +12,12 @@
 
     <string name="title">Title</string>
     <string name="des">Description</string>
-    <string name="select_color">Select Color</string>
+    <string name="select_color">Select Chord Color</string>
     <string name="last_modified">Last Modified\n</string>
     <string name="created_at">Created at\n</string>
     <string name="share_title">Hey, Check MyNote:-\nTitle:</string>
     <string name="share_description">\nDescription:</string>
     <string name="enter_a_description">Enter a description</string>
     <string name="no_title">No Title</string>
+    <string name="cancel">Cancel</string>
 </resources>

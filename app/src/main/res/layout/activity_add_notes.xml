@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/v_scroll_layout"
+    style="@android:style/Widget.Material.ScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.AddNotesActivity">
@@ -20,10 +22,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:gravity="center"
+        android:gravity="right"
         android:maxLines="2"
         android:padding="16dp"
-        android:textAlignment="center"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
         android:textColor="@color/colorGrey"
         tools:text="Last mofified 27 May 01:23 PM" />
@@ -75,7 +76,7 @@
         android:id="@+id/et_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/v_tools_lay"
+        android:layout_above="@id/tv_remainder"
         android:layout_below="@id/tv_description"
         android:layout_margin="8dp"
         android:background="@null"
@@ -85,6 +86,21 @@
         android:imeOptions="actionDone"
         android:inputType="textMultiLine|textCapSentences"
         android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/tv_remainder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/v_tools_lay"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:drawablePadding="4dp"
+        android:drawableRight="@drawable/ic_alarm_on"
+        android:gravity="right|center_vertical"
+        android:padding="8dp"
+        android:textColor="@color/colorGrey"
+        android:textSize="10sp"
+        android:visibility="invisible" />
 
 
     <LinearLayout
@@ -139,7 +155,8 @@
             android:layout_marginRight="8dp"
             android:background="@drawable/ic_grey_round"
             android:padding="8dp"
-            android:src="@drawable/ic_delete" />
+            android:src="@drawable/ic_delete"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -148,6 +165,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:orientation="vertical">
 
 
@@ -168,7 +186,8 @@
             android:paddingTop="4dp"
             android:text="@string/select_color"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorRedDark" />
+            android:textColor="@color/colorRedDark"
+            android:textSize="12sp" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -188,8 +207,8 @@
 
                 <RadioButton
                     android:id="@+id/rb_green"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:background="@drawable/selector_color_green"
@@ -197,8 +216,8 @@
 
                 <RadioButton
                     android:id="@+id/rb_green_light"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:background="@drawable/selector_color_green_light"
@@ -206,8 +225,8 @@
 
                 <RadioButton
                     android:id="@+id/rb_color_blue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:background="@drawable/selector_color_blue"
@@ -215,8 +234,8 @@
 
                 <RadioButton
                     android:id="@+id/rb_color_violet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:background="@drawable/selector_color_violet"
@@ -224,8 +243,8 @@
 
                 <RadioButton
                     android:id="@+id/rb_color_pink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:background="@drawable/selector_color_pink"
@@ -233,8 +252,8 @@
 
                 <RadioButton
                     android:id="@+id/rb_color_orange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:background="@drawable/selector_color_orrange"

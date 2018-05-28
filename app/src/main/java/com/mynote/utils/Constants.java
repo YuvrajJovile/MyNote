@@ -35,6 +35,8 @@ public class Constants {
     public static String COLUMN_TIMESTAMP = "timestamp";
     public static String COLUMN_COLOR = "color";
     public static String COLUMN_CREATED_OR_MODIFIED = "created_or_modified";
+    public static String COLUMN_FAVORITE = "favorite";
+    public static String COLUMN_REMAINDER_TIME = "remainder_time";
 
 
     public static String CHORD_COLOR = "chord_color";
@@ -51,6 +53,12 @@ public class Constants {
 
     public static String CREATED = "created";
     public static String MODIFIED = "modified";
+
+
+    public static int POTRAIT = 1;
+    public static int LANDSCAPE = 2;
+
+
 
 
 
