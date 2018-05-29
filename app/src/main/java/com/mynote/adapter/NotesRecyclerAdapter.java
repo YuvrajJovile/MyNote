@@ -19,6 +19,7 @@ import com.mynote.database.model.NotesModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -100,6 +101,11 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
             }
 
             tvDate.setText(dateString.toUpperCase());
+
+            long alarmTime = notesModel.getRemainderTime();
+            if (alarmTime != -1 && alarmTime > Calendar.getInstance().getTimeInMillis())
+                tvDate.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_alarm_on, 0, 0, 0);
+
 
             try {
                 mLayout.setCardBackgroundColor(Color.parseColor(notesModel.getColor()));

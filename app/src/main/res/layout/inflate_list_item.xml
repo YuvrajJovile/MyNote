@@ -46,6 +46,7 @@
 
 
         <TextView
+            android:drawablePadding="4dp"
             android:id="@+id/tv_date"
             android:layout_width="match_parent"
             android:layout_height="0dp"

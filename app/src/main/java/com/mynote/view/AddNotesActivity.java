@@ -30,6 +30,7 @@ import com.mynote.R;
 import com.mynote.broadcast.RemainderBroadcast;
 import com.mynote.database.NotesTable;
 import com.mynote.database.model.NotesModel;
+import com.mynote.utils.RingToneManagerClass;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -98,6 +99,8 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private boolean mFlagChangesMade = false;
 
+    private NotesModel mNotesModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,18 +154,25 @@ public class AddNotesActivity extends AppCompatActivity {
                 mChordColor = bundle.getString(CHORD_COLOR);
                 mCreatedOrModified = bundle.getString(COLUMN_CREATED_OR_MODIFIED);
                 mFlagSwitchFavorites = Boolean.parseBoolean(bundle.getString(COLUMN_FAVORITE));
-                mFlagSwitchRemainder = Boolean.parseBoolean(bundle.getString(COLUMN_FAVORITE));
+
 
                 mRemainderTime = Long.parseLong(bundle.getString(COLUMN_REMAINDER_TIME));
 
                 if (mRemainderTime < mAlarmCalandar.getTimeInMillis()) {
                     mRemainderTime = -1;
+                    mFlagSwitchRemainder = false;
+                    mRemainderSet = false;
+
                 } else {
                     mRemainderSet = true;
+                    mFlagSwitchRemainder = true;
                     mtvRemainder.setVisibility(View.VISIBLE);
                     mAlarmCalandar.setTimeInMillis(mRemainderTime);
+
+                    int hour = mAlarmCalandar.get(Calendar.HOUR);
+                    hour = (hour == 0) ? 12 : hour;
                     mtvRemainder.setText("Remainder set on: " + mAlarmCalandar.get(Calendar.DAY_OF_MONTH) + "/" + (mAlarmCalandar.get(Calendar.MONTH) + 1)
-                            + "/" + mAlarmCalandar.get(Calendar.YEAR) + "\t" + mAlarmCalandar.get(Calendar.HOUR) + ":" + mAlarmCalandar.get(Calendar.MINUTE));
+                            + "/" + mAlarmCalandar.get(Calendar.YEAR) + "\t" + hour + ":" + mAlarmCalandar.get(Calendar.MINUTE));
 
                 }
 
@@ -220,7 +230,7 @@ public class AddNotesActivity extends AppCompatActivity {
 
             if (mRemainderTime != -1) {
                 Intent intent = new Intent(this, RemainderBroadcast.class);
-                mPendingIntent = PendingIntent.getBroadcast(this, (int) mRemainderTime, intent, 0);
+                mPendingIntent = PendingIntent.getBroadcast(this, (int) mID, intent, 0);
             }
         }
 
@@ -261,7 +271,6 @@ public class AddNotesActivity extends AppCompatActivity {
 
 
                 if (mRemainderSet) {
-
                     ShowRemaiderEditDialog();
                 } else if (validate())
                     performOnClickRemainder();
@@ -275,6 +284,8 @@ public class AddNotesActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
 
+
+                mFlagChangesMade = true;
 
                 switch (checkedId) {
                     case R.id.rb_green:
@@ -354,12 +365,21 @@ public class AddNotesActivity extends AppCompatActivity {
     }
 
     private void cancelRemainder() {
+        RingToneManagerClass.getInstance().stopAlarm();
+
         if (mPendingIntent != null) {
             mAlarmManager.cancel(mPendingIntent);
             mtvRemainder.setVisibility(View.GONE);
+            mFlagSwitchRemainder = false;
             mIbRemainder.setSelected(false);
             mRemainderSet = false;
+
+            mRemainderTime = -1;
+            mFlagChangesMade = true;
+
+
             showMessage("Remainder Canceled");
+
         }
     }
 
@@ -392,6 +412,7 @@ public class AddNotesActivity extends AppCompatActivity {
         };
         final TimePickerDialog timePickerDialog = new TimePickerDialog(this, onTimeSetListener, mAlarmCalandar.get(Calendar.HOUR_OF_DAY), mAlarmCalandar.get(Calendar.MINUTE), false);
 
+
         DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -406,6 +427,7 @@ public class AddNotesActivity extends AppCompatActivity {
 
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, onDateSetListener, mAlarmCalandar.get(Calendar.YEAR), mAlarmCalandar.get(Calendar.MONTH), mAlarmCalandar.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
         datePickerDialog.show();
 
 
@@ -414,7 +436,7 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private void setOrEditAlarm(Calendar mAlarmCalandar) {
 
-
+        mFlagChangesMade = true;
         String title = etTitle.getText().toString().isEmpty() ? getString(R.string.no_title) : etTitle.getText().toString();
         String des = etDescription.getText().toString();
 
@@ -434,8 +456,12 @@ public class AddNotesActivity extends AppCompatActivity {
         new PerformUpdate().doInBackground(notesModel);
         mtvRemainder.setVisibility(View.VISIBLE);
 
+
+        int hour = mAlarmCalandar.get(Calendar.HOUR);
+        hour = (hour == 0) ? 12 : hour;
+
         mtvRemainder.setText("Remainder set on: " + mAlarmCalandar.get(Calendar.DAY_OF_MONTH) + "/" + (mAlarmCalandar.get(Calendar.MONTH) + 1)
-                + "/" + mAlarmCalandar.get(Calendar.YEAR) + "\t" + mAlarmCalandar.get(Calendar.HOUR) + ":" + mAlarmCalandar.get(Calendar.MINUTE));
+                + "/" + mAlarmCalandar.get(Calendar.YEAR) + "\t" + hour + ":" + mAlarmCalandar.get(Calendar.MINUTE));
 
 
         if (mPendingIntent != null) {
@@ -443,15 +469,17 @@ public class AddNotesActivity extends AppCompatActivity {
         }
 
         Intent intent = new Intent(this, RemainderBroadcast.class);
-        mPendingIntent = PendingIntent.getBroadcast(this, (int) mRemainderTime, intent, 0);
+        intent.putExtra("id", mID);
+        mPendingIntent = PendingIntent.getBroadcast(this, (int) mID, intent, 0);
         mAlarmManager.set(AlarmManager.RTC, mAlarmCalandar.getTimeInMillis(), mPendingIntent);
         mRemainderSet = true;
         showMessage("Remainder Set");
+        mIbRemainder.setSelected(true);
     }
 
     private void performOnCLickFavorites() {
 
-
+        mFlagChangesMade = true;
         if (mIbFavorites.isSelected()) {
             mIbFavorites.setSelected(false);
             mFlagSwitchFavorites = false;
@@ -494,22 +522,19 @@ public class AddNotesActivity extends AppCompatActivity {
             String createOrEdit = CREATE;
 
 
-            NotesModel notesModel;
-
-
             Intent intent = new Intent();
             Bundle bundleReturn = new Bundle();
 
 
             if (flagEditOrCreate.equals(EDIT)) {
                 mCreatedOrModified = MODIFIED;
-                notesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
-                new PerformUpdate().doInBackground(notesModel);
+                mNotesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
+                new PerformUpdate().doInBackground(mNotesModel);
                 createOrEdit = EDIT;
             } else {
                 mCreatedOrModified = CREATED;
-                notesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
-                mID = new PerformInsert().doInBackground(notesModel);
+                mNotesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
+                mID = new PerformInsert().doInBackground(mNotesModel);
             }
 
 
@@ -593,6 +618,22 @@ public class AddNotesActivity extends AppCompatActivity {
         mToast.show();
     }
 
+
+    class PerformGetNote extends AsyncTask<Long, Void, NotesModel> {
+        protected void onPreExecute() {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected NotesModel doInBackground(Long... longs) {
+            return mNotesTable.getNote(longs[0]);
+        }
+
+        @Override
+        protected void onPostExecute(NotesModel notesModel) {
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
 
     class PerformDelete extends AsyncTask<Void, Void, Void> {
 

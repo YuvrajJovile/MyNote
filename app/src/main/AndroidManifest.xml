@@ -36,7 +36,15 @@
         <service
             android:name=".service.RemainderService"
             android:enabled="true" />
+
         <receiver android:name=".broadcast.RemainderBroadcast" />
+
+
+        <service
+            android:name=".service.DeleteRemainderService"
+            android:enabled="true" />
+
+        <receiver android:name=".broadcast.DismissNotificationBroadcast" />
 
     </application>
 
