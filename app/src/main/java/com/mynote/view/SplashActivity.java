@@ -20,7 +20,7 @@ public class SplashActivity extends AppCompatActivity {
 
         TextView tvSplash = findViewById(R.id.tv_splash);
 
-        Typeface lTypeface = null;
+        Typeface lTypeface;
 
         try{
             lTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/Pacifico.ttf");
@@ -34,9 +34,9 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                Intent lIntent = new Intent(SplashActivity.this, MainActivity.class);
+                lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(lIntent);
                 finish();
             }
         }, 500);

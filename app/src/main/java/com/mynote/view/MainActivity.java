@@ -1,5 +1,6 @@
 package com.mynote.view;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -135,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+
+        Log.d(TAG, "Orientation Changed");
         setWelcomeMessage();
 
         setOrientation();
@@ -244,7 +247,82 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(lIntent, ID_CREATE_OR_EDIT_OR_DELETE);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == ID_CREATE_OR_EDIT_OR_DELETE && resultCode == RESULT_OK && data != null && (mSelectedPos != -1 || mFlagCreate)) {
+
+            mFlagCreate = false;
+
+            Bundle lResultBundle = data.getExtras();
+            NotesModel lNotesModel = new NotesModel();
+
+
+            String lCreateOrEdit = null;
+
+            if (lResultBundle != null)
+                lCreateOrEdit = lResultBundle.getString(EDIT_OR_CREATE_OR_DELETE);
+
+            if (lCreateOrEdit != null) {
+                if (lCreateOrEdit.equals(EDIT) || lCreateOrEdit.equals(CREATE)) {
+
+                    long id = Integer.parseInt(lResultBundle.getString(DATA_ID));
+
+
+                    Log.d(this + "", "id==" + id);
+
+                    lNotesModel.setId(id);
+                    lNotesModel.setTitle(lResultBundle.getString(DATA_TITLE));
+                    lNotesModel.setDescription(lResultBundle.getString(DATA_DES));
+                    lNotesModel.setDate(lResultBundle.getString(DATA_DATE));
+                    lNotesModel.setColor(lResultBundle.getString(CHORD_COLOR));
+                    lNotesModel.setCreatedOrModified(lResultBundle.getString(COLUMN_CREATED_OR_MODIFIED));
+                    lNotesModel.setFavourite(Boolean.parseBoolean(lResultBundle.getString(COLUMN_FAVORITE)));
+                    lNotesModel.setRemainderTime(Long.parseLong(lResultBundle.getString(COLUMN_REMAINDER_TIME)));
+
+                    if (lCreateOrEdit.equals(EDIT) && id != -1) {
+
+                        for (int i = 0; i < mNotesListData.size(); i++) {
+
+                            if (mNotesListData.get(i).getId() == id) {
+                                mNotesListData.remove(i);
+                                break;
+                            }
+                        }
+
+                    }
+
+
+                    mNotesListData.add(0, lNotesModel);
+
+                    //mNotesRecyclerAdapter.notifyDataSetChanged();
+               /* if (createOrEdit.equals(EDIT)) {
+
+                    // mNotesRecyclerAdapter.notifyItemInserted(0);
+                    //mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
+                    //  mNotesRecyclerAdapter.notifyItemRangeRemoved(mSelectedPos, mNotesListData.size());
+                } else {
+                    //  mNotesRecyclerAdapter.notifyItemInserted(0);
+                    // mNotesRecyclerAdapter.notifyItemRangeChanged(0,mNotesListData.size());
+                    //mNotesRecyclerAdapter.notifyDataSetChanged();
+                }*/
+
+
+                } else if (lCreateOrEdit.equals(DELETE)) {
+                    mNotesListData.remove(mSelectedPos);
+                    //mNotesRecyclerAdapter.notifyDataSetChanged();
+                    // mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
+                    // mNotesRecyclerAdapter.notifyItemRangeChanged(mSelectedPos, mNotesRecyclerAdapter.getItemCount());
+                }
+            }
+
+            mNotesRecyclerAdapter.notifyDataSetChanged();
+            setWelcomeMessage();
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
     private class GetNotes extends AsyncTask<Void, Void, Void> {
 
 
@@ -270,77 +348,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ID_CREATE_OR_EDIT_OR_DELETE && resultCode == RESULT_OK && data != null && (mSelectedPos != -1 || mFlagCreate)) {
-
-            mFlagCreate = false;
-
-            Bundle lResultBundle = data.getExtras();
-            NotesModel lNotesModel = new NotesModel();
-
-            String lCreateOrEdit = lResultBundle.getString(EDIT_OR_CREATE_OR_DELETE);
-
-            if (lCreateOrEdit.equals(EDIT) || lCreateOrEdit.equals(CREATE)) {
-
-                long id = Integer.parseInt(lResultBundle.getString(DATA_ID));
-
-
-                Log.d(this + "", "id==" + id);
-
-                lNotesModel.setId(id);
-                lNotesModel.setTitle(lResultBundle.getString(DATA_TITLE));
-                lNotesModel.setDescription(lResultBundle.getString(DATA_DES));
-                lNotesModel.setDate(lResultBundle.getString(DATA_DATE));
-                lNotesModel.setColor(lResultBundle.getString(CHORD_COLOR));
-                lNotesModel.setCreatedOrModified(lResultBundle.getString(COLUMN_CREATED_OR_MODIFIED));
-                lNotesModel.setFavourite(Boolean.parseBoolean(lResultBundle.getString(COLUMN_FAVORITE)));
-                lNotesModel.setRemainderTime(Long.parseLong(lResultBundle.getString(COLUMN_REMAINDER_TIME)));
-
-                if (lCreateOrEdit.equals(EDIT) && id != -1) {
-
-                    for (int i = 0; i < mNotesListData.size(); i++) {
-
-                        if (mNotesListData.get(i).getId() == id) {
-                            mNotesListData.remove(i);
-                            break;
-                        }
-                    }
-
-                }
-
-
-                mNotesListData.add(0, lNotesModel);
-
-                //mNotesRecyclerAdapter.notifyDataSetChanged();
-               /* if (createOrEdit.equals(EDIT)) {
-
-                    // mNotesRecyclerAdapter.notifyItemInserted(0);
-                    //mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
-                    //  mNotesRecyclerAdapter.notifyItemRangeRemoved(mSelectedPos, mNotesListData.size());
-                } else {
-                    //  mNotesRecyclerAdapter.notifyItemInserted(0);
-                    // mNotesRecyclerAdapter.notifyItemRangeChanged(0,mNotesListData.size());
-                    //mNotesRecyclerAdapter.notifyDataSetChanged();
-                }*/
-
-
-            } else if (lCreateOrEdit.equals(DELETE)) {
-                mNotesListData.remove(mSelectedPos);
-                //mNotesRecyclerAdapter.notifyDataSetChanged();
-                // mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
-                // mNotesRecyclerAdapter.notifyItemRangeChanged(mSelectedPos, mNotesRecyclerAdapter.getItemCount());
-            }
-
-            mNotesRecyclerAdapter.notifyDataSetChanged();
-            setWelcomeMessage();
-        }
-    }
-
-
+    @SuppressLint("StaticFieldLeak")
     class DeleteNotes extends AsyncTask<NotesModel, Void, Void> {
 
 
@@ -355,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
             mNotesTable.deleteNotes(pNotesModel[0].getId());
             mNotesListData.remove(mSelectedPos);
             mNotesRecyclerAdapter.notifyDataSetChanged();
+            showMessage(getString(R.string.note_deleted));
             setWelcomeMessage();
             return null;
         }
