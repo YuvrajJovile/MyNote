@@ -17,7 +17,6 @@ public class Constants {
     public static String DATA_DES = "data_des";
     public static String DATA_DATE = "data_date";
     public static String DATA_ID = "data_id";
-    public static String DATA_CHECK_ID = "data_check_id";
     public static String EDIT_OR_CREATE_OR_DELETE = "edit_or_create_del";
 
 

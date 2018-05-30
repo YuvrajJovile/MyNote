@@ -27,10 +27,10 @@ public class NotesTable {
     static DatabaseHelper mDBhelper;
 
 
-    public NotesTable() {
+   /* public NotesTable() {
         Log.d(this + "", "NotesTable is called");
 
-    }
+    }*/
 
     public NotesTable(Context pContext) {
         mDBhelper = new DatabaseHelper(pContext);
@@ -39,7 +39,7 @@ public class NotesTable {
     }
 
 
-    public static final String CREATE_TABLE =
+    private static final String CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + "("
                     + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + COLUMN_NOTE_TITLE + " TEXT,"
@@ -78,9 +78,9 @@ public class NotesTable {
     public NotesModel getNote(long id) {
 
 
-        SQLiteDatabase db = mDBhelper.getReadableDatabase();
+        SQLiteDatabase lDb = mDBhelper.getReadableDatabase();
 
-        String[] projection = {
+        String[] lProjection = {
                 COLUMN_ID,
                 COLUMN_NOTE_TITLE,
                 COLUMN_NOTE_DESRIPTION,
@@ -91,31 +91,31 @@ public class NotesTable {
                 COLUMN_REMAINDER_TIME
         };
 
-        String selection = COLUMN_ID + " = ?";
-        String[] selectionArgs = {id + ""};
+        String lSelection = COLUMN_ID + " = ?";
+        String[] lSelectionArgs = {id + ""};
 
-        Cursor cursor = db.query(TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
+        Cursor lCursor = lDb.query(TABLE_NAME,
+                lProjection,
+                lSelection,
+                lSelectionArgs,
                 null,
                 null,
                 null);
 
-        if (cursor != null)
-            cursor.moveToFirst();
+        if (lCursor != null)
+            lCursor.moveToFirst();
 
         NotesModel lData = new NotesModel(
-                cursor.getInt(cursor.getColumnIndex(COLUMN_ID)),
-                cursor.getString(cursor.getColumnIndex(COLUMN_NOTE_TITLE)),
-                cursor.getString(cursor.getColumnIndex(COLUMN_NOTE_DESRIPTION)),
-                cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)),
-                cursor.getString(cursor.getColumnIndex(COLUMN_COLOR)),
-                cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)),
-                Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(COLUMN_FAVORITE))),
-                Long.parseLong(cursor.getString(cursor.getColumnIndex(COLUMN_REMAINDER_TIME))));
-        cursor.close();
-
+                lCursor.getInt(lCursor.getColumnIndex(COLUMN_ID)),
+                lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_TITLE)),
+                lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_DESRIPTION)),
+                lCursor.getString(lCursor.getColumnIndex(COLUMN_TIMESTAMP)),
+                lCursor.getString(lCursor.getColumnIndex(COLUMN_COLOR)),
+                lCursor.getString(lCursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)),
+                Boolean.parseBoolean(lCursor.getString(lCursor.getColumnIndex(COLUMN_FAVORITE))),
+                Long.parseLong(lCursor.getString(lCursor.getColumnIndex(COLUMN_REMAINDER_TIME))));
+        lCursor.close();
+        lDb.close();
 
         return lData;
     }
@@ -126,35 +126,36 @@ public class NotesTable {
 
         List<NotesModel> lNotesModels = new ArrayList<>();
 
-        String sellectQuery = "SELECT * FROM " + TABLE_NAME + " ORDER BY " +
+        String lSelectQuery = "SELECT * FROM " + TABLE_NAME + " ORDER BY " +
                 COLUMN_TIMESTAMP + " DESC";
 
-        SQLiteDatabase db = mDBhelper.getWritableDatabase();
-        Cursor cursor = db.rawQuery(sellectQuery, null);
+        SQLiteDatabase lDb = mDBhelper.getWritableDatabase();
+        Cursor lCursor = lDb.rawQuery(lSelectQuery, null);
 
-        if (cursor.moveToFirst()) {
+        if (lCursor.moveToFirst()) {
             do {
 
                 NotesModel lNotesModel = new NotesModel();
-                lNotesModel.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
-                lNotesModel.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_NOTE_TITLE)));
-                lNotesModel.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_NOTE_DESRIPTION)));
-                lNotesModel.setDate(cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
-                lNotesModel.setColor(cursor.getString(cursor.getColumnIndex(COLUMN_COLOR)));
-                lNotesModel.setCreatedOrModified(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)));
-                lNotesModel.setFavourite(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(COLUMN_FAVORITE))));
-                lNotesModel.setRemainderTime(Long.parseLong(cursor.getString(cursor.getColumnIndex(COLUMN_REMAINDER_TIME))));
+                lNotesModel.setId(lCursor.getInt(lCursor.getColumnIndex(COLUMN_ID)));
+                lNotesModel.setTitle(lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_TITLE)));
+                lNotesModel.setDescription(lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_DESRIPTION)));
+                lNotesModel.setDate(lCursor.getString(lCursor.getColumnIndex(COLUMN_TIMESTAMP)));
+                lNotesModel.setColor(lCursor.getString(lCursor.getColumnIndex(COLUMN_COLOR)));
+                lNotesModel.setCreatedOrModified(lCursor.getString(lCursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)));
+                lNotesModel.setFavourite(Boolean.parseBoolean(lCursor.getString(lCursor.getColumnIndex(COLUMN_FAVORITE))));
+                lNotesModel.setRemainderTime(Long.parseLong(lCursor.getString(lCursor.getColumnIndex(COLUMN_REMAINDER_TIME))));
 
                 lNotesModels.add(lNotesModel);
-            } while (cursor.moveToNext());
+            } while (lCursor.moveToNext());
         }
 
-        db.close();
+        lCursor.close();
+        lDb.close();
 
         return lNotesModels;
     }
 
-    public int getNotesCount() {
+   /* public int getNotesCount() {
 
         String queryString = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = mDBhelper.getReadableDatabase();
@@ -164,7 +165,7 @@ public class NotesTable {
         cursor.close();
 
         return count;
-    }
+    }*/
 
 
     public void upDateNotes(NotesModel pNotesModel) {

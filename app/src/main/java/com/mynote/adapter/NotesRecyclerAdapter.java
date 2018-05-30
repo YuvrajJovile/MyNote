@@ -22,12 +22,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static com.mynote.utils.Constants.MODIFIED;
 
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.NotesRecyclerViewHolder> {
 
-    public List<NotesModel> mDataList;
+    private List<NotesModel> mDataList;
     private INotesRecyclerListener mINotesRecyclerListener;
 
     public NotesRecyclerAdapter(List<NotesModel> pDataList, INotesRecyclerListener pINotesRecyclerListener) {
@@ -121,7 +122,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         private TextView tvDate;
         private CardView mLayout;
 
-        public NotesRecyclerViewHolder(View itemView, INotesRecyclerListener pINotesRecyclerListener) {
+        private NotesRecyclerViewHolder(View itemView, INotesRecyclerListener pINotesRecyclerListener) {
             super(itemView);
             this.mINotesRecyclerListener = pINotesRecyclerListener;
             tvTitle = itemView.findViewById(R.id.tv_title);
@@ -131,11 +132,11 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
             mLayout.setOnClickListener(this);
         }
 
-        public void populateData(NotesModel notesModel) {
+        private void populateData(NotesModel notesModel) {
             this.mNotesModel = notesModel;
 
-            SimpleDateFormat lOutputFormat = new SimpleDateFormat("dd MMM yyyy \thh:mm a");
-            SimpleDateFormat lInputFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a");
+            SimpleDateFormat lOutputFormat = new SimpleDateFormat("dd MMM yyyy \thh:mm a", Locale.ENGLISH);
+            SimpleDateFormat lInputFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a", Locale.ENGLISH);
 
 
             tvTitle.setText(notesModel.getTitle());
