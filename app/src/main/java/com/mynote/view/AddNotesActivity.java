@@ -83,8 +83,8 @@ public class AddNotesActivity extends AppCompatActivity {
     private String mCreatedOrModified = CREATED;
 
     private Calendar mAlarmCalandar;
-    private boolean flagDateSelected = false;
-    private boolean flagTimeSelected = false;
+    private boolean mFlagDateSelected = false;
+    private boolean mFlagTimeSelected = false;
 
 
     private PendingIntent mPendingIntent;
@@ -406,7 +406,8 @@ public class AddNotesActivity extends AppCompatActivity {
 
                 mAlarmCalandar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mAlarmCalandar.set(Calendar.MINUTE, minute);
-                flagTimeSelected = true;
+                mFlagTimeSelected = true;
+
                 setOrEditAlarm(mAlarmCalandar);
             }
         };
@@ -420,11 +421,16 @@ public class AddNotesActivity extends AppCompatActivity {
                 mAlarmCalandar.set(Calendar.YEAR, year);
                 mAlarmCalandar.set(Calendar.MONTH, month);
                 mAlarmCalandar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                flagDateSelected = true;
+                mFlagDateSelected = true;
                 lTimePickerDialog.show();
             }
         };
 
+
+        if (mFlagDateSelected && !mFlagTimeSelected) {
+            mAlarmCalandar = Calendar.getInstance();
+            mFlagDateSelected = false;
+        }
 
         DatePickerDialog lDatePickerDialog = new DatePickerDialog(this, lOnDateSetListener, mAlarmCalandar.get(Calendar.YEAR), mAlarmCalandar.get(Calendar.MONTH), mAlarmCalandar.get(Calendar.DAY_OF_MONTH));
         lDatePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
@@ -558,7 +564,6 @@ public class AddNotesActivity extends AppCompatActivity {
         }
 
     }
-
 
 
     private void performDelete() {
