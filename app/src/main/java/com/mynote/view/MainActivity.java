@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.mynote.R;
 import com.mynote.adapter.NotesRecyclerAdapter;
-import com.mynote.adapter.listner.INotesRecyclerListner;
+import com.mynote.adapter.listner.INotesRecyclerListener;
 import com.mynote.database.NotesTable;
 import com.mynote.database.model.NotesModel;
 import com.mynote.utils.NotesApplication;
@@ -70,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
     private boolean mFlagCreate = false;
 
 
+    private INotesRecyclerListener iNotesRecyclerListener = new INotesRecyclerListener() {
+        @Override
+        public void onClick(NotesModel data, int pos) {
+            //showAllert(data);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
         mBackgroundLay = findViewById(R.id.v_background_lay);
 
 
+        init();
+
+    }
+
+    private void init() {
         mFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,26 +106,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mNotesListData = new ArrayList<>();
-
-
         mNotesTable = new NotesTable(this);
-
         new GetNotes().doInBackground();
-
-        for (int i = 0; i < mNotesListData.size(); i++) {
-            Log.d(TAG, "data ==" + mNotesListData.get(i).getId());
-        }
-
     }
-
 
     private void navigateToDelete(final NotesModel pNotesModel) {
 
 
-        final AlertDialog.Builder alBuilder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder lAlBuilder = new AlertDialog.Builder(this);
 
-        alBuilder.setTitle(R.string.delete);
-        alBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+        lAlBuilder.setTitle(R.string.delete);
+        lAlBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 new DeleteNotes().doInBackground(pNotesModel);
@@ -125,13 +128,23 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }).create();
-        alBuilder.show();
+        lAlBuilder.show();
 
     }
 
+
+    @Override
+    protected void onResume() {
+        setWelcomeMessage();
+
+        setOrientation();
+
+        super.onResume();
+    }
+
     private void setWelcomeMessage() {
-        String flag = NotesApplication.getInstance().getLoginDetails();
-        if (flag.isEmpty() || flag.equals(OUT)
+        String lLoginFlag = NotesApplication.getInstance().getLoginDetails();
+        if (lLoginFlag.isEmpty() || lLoginFlag.equals(OUT)
                 ) {
             mtvWelcome.setVisibility(View.VISIBLE);
             mAddNotesText.setVisibility(View.VISIBLE);
@@ -158,16 +171,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    @Override
-    protected void onResume() {
-        setWelcomeMessage();
-
-        setOrientation();
-
-        super.onResume();
-    }
-
     private void setOrientation() {
 
         int orientation = getResources().getConfiguration().orientation;
@@ -185,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (mNotesRecyclerAdapter == null) {
-            mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotesListData, iNotesRecyclerListner);
+            mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotesListData, iNotesRecyclerListener);
             mNotesRecycler.setAdapter(mNotesRecyclerAdapter);
-            NotesRecyclerAdapter.RecyclerTouchListner recyclerTouchListner = new NotesRecyclerAdapter.RecyclerTouchListner(MainActivity.this, mNotesRecycler, new NotesRecyclerAdapter.NotesClickListner() {
+            NotesRecyclerAdapter.RecyclerTouchListener recyclerTouchListener = new NotesRecyclerAdapter.RecyclerTouchListener(MainActivity.this, mNotesRecycler, new NotesRecyclerAdapter.INotesClickListener() {
                 @Override
                 public void onClick(View view, int pos) {
                     mSelectedPos = pos;
@@ -204,49 +207,41 @@ public class MainActivity extends AppCompatActivity {
 
 
             });
-            mNotesRecycler.addOnItemTouchListener(recyclerTouchListner);
+            mNotesRecycler.addOnItemTouchListener(recyclerTouchListener);
         }
 
     }
-
-    private INotesRecyclerListner iNotesRecyclerListner = new INotesRecyclerListner() {
-        @Override
-        public void onClick(NotesModel data, int pos) {
-            //showAllert(data);
-        }
-    };
-
 
     private void navigateToEdit(NotesModel pData) {
 
-        Intent intent = new Intent(MainActivity.this, AddNotesActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(EDIT_OR_CREATE_OR_DELETE, EDIT);
-        bundle.putString(DATA_TITLE, pData.getTitle());
-        bundle.putString(DATA_DES, pData.getDescription());
-        bundle.putString(DATA_DATE, pData.getDate());
-        bundle.putString(DATA_ID, pData.getId() + "");
-        bundle.putString(CHORD_COLOR, pData.getColor());
-        bundle.putString(COLUMN_CREATED_OR_MODIFIED, pData.getCreatedOrModified());
-        bundle.putString(COLUMN_FAVORITE, pData.isFavourite() + "");
-        bundle.putString(COLUMN_REMAINDER_TIME, pData.getRemainderTime() + "");
-        intent.putExtras(bundle);
-        startActivityForResult(intent, ID_CREATE_OR_EDIT_OR_DELETE);
+        Intent lIntent = new Intent(MainActivity.this, AddNotesActivity.class);
+        Bundle lBundle = new Bundle();
+        lBundle.putString(EDIT_OR_CREATE_OR_DELETE, EDIT);
+        lBundle.putString(DATA_TITLE, pData.getTitle());
+        lBundle.putString(DATA_DES, pData.getDescription());
+        lBundle.putString(DATA_DATE, pData.getDate());
+        lBundle.putString(DATA_ID, pData.getId() + "");
+        lBundle.putString(CHORD_COLOR, pData.getColor());
+        lBundle.putString(COLUMN_CREATED_OR_MODIFIED, pData.getCreatedOrModified());
+        lBundle.putString(COLUMN_FAVORITE, pData.isFavourite() + "");
+        lBundle.putString(COLUMN_REMAINDER_TIME, pData.getRemainderTime() + "");
+        lIntent.putExtras(lBundle);
+        startActivityForResult(lIntent, ID_CREATE_OR_EDIT_OR_DELETE);
 
     }
 
 
-    private void showMessage(String mData) {
-        Toast.makeText(this, mData, Toast.LENGTH_SHORT).show();
+    private void showMessage(String pData) {
+        Toast.makeText(this, pData, Toast.LENGTH_SHORT).show();
     }
 
     private void navigateToAddNotesActivity() {
         mFlagCreate = true;
-        Bundle bundle = new Bundle();
-        Intent intent = new Intent(this, AddNotesActivity.class);
-        bundle.putString(EDIT_OR_CREATE_OR_DELETE, CREATE);
-        intent.putExtras(bundle);
-        startActivityForResult(intent, ID_CREATE_OR_EDIT_OR_DELETE);
+        Bundle lBundle = new Bundle();
+        Intent lIntent = new Intent(this, AddNotesActivity.class);
+        lBundle.putString(EDIT_OR_CREATE_OR_DELETE, CREATE);
+        lIntent.putExtras(lBundle);
+        startActivityForResult(lIntent, ID_CREATE_OR_EDIT_OR_DELETE);
     }
 
 
@@ -284,28 +279,28 @@ public class MainActivity extends AppCompatActivity {
 
             mFlagCreate = false;
 
-            Bundle resultBundle = data.getExtras();
-            NotesModel notesModel = new NotesModel();
+            Bundle lResultBundle = data.getExtras();
+            NotesModel lNotesModel = new NotesModel();
 
-            String createOrEdit = resultBundle.getString(EDIT_OR_CREATE_OR_DELETE);
+            String lCreateOrEdit = lResultBundle.getString(EDIT_OR_CREATE_OR_DELETE);
 
-            if (createOrEdit.equals(EDIT) || createOrEdit.equals(CREATE)) {
+            if (lCreateOrEdit.equals(EDIT) || lCreateOrEdit.equals(CREATE)) {
 
-                long id = Integer.parseInt(resultBundle.getString(DATA_ID));
+                long id = Integer.parseInt(lResultBundle.getString(DATA_ID));
 
 
                 Log.d(this + "", "id==" + id);
 
-                notesModel.setId(id);
-                notesModel.setTitle(resultBundle.getString(DATA_TITLE));
-                notesModel.setDescription(resultBundle.getString(DATA_DES));
-                notesModel.setDate(resultBundle.getString(DATA_DATE));
-                notesModel.setColor(resultBundle.getString(CHORD_COLOR));
-                notesModel.setCreatedOrModified(resultBundle.getString(COLUMN_CREATED_OR_MODIFIED));
-                notesModel.setFavourite(Boolean.parseBoolean(resultBundle.getString(COLUMN_FAVORITE)));
-                notesModel.setRemainderTime(Long.parseLong(resultBundle.getString(COLUMN_REMAINDER_TIME)));
+                lNotesModel.setId(id);
+                lNotesModel.setTitle(lResultBundle.getString(DATA_TITLE));
+                lNotesModel.setDescription(lResultBundle.getString(DATA_DES));
+                lNotesModel.setDate(lResultBundle.getString(DATA_DATE));
+                lNotesModel.setColor(lResultBundle.getString(CHORD_COLOR));
+                lNotesModel.setCreatedOrModified(lResultBundle.getString(COLUMN_CREATED_OR_MODIFIED));
+                lNotesModel.setFavourite(Boolean.parseBoolean(lResultBundle.getString(COLUMN_FAVORITE)));
+                lNotesModel.setRemainderTime(Long.parseLong(lResultBundle.getString(COLUMN_REMAINDER_TIME)));
 
-                if (createOrEdit.equals(EDIT) && id != -1) {
+                if (lCreateOrEdit.equals(EDIT) && id != -1) {
 
                     for (int i = 0; i < mNotesListData.size(); i++) {
 
@@ -318,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-                mNotesListData.add(0, notesModel);
+                mNotesListData.add(0, lNotesModel);
 
                 //mNotesRecyclerAdapter.notifyDataSetChanged();
                /* if (createOrEdit.equals(EDIT)) {
@@ -333,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
                 }*/
 
 
-            } else if (createOrEdit.equals(DELETE)) {
+            } else if (lCreateOrEdit.equals(DELETE)) {
                 mNotesListData.remove(mSelectedPos);
                 //mNotesRecyclerAdapter.notifyDataSetChanged();
                 // mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);

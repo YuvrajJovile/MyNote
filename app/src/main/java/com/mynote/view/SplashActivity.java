@@ -20,16 +20,16 @@ public class SplashActivity extends AppCompatActivity {
 
         TextView tvSplash = findViewById(R.id.tv_splash);
 
-        Typeface typeface = null;
+        Typeface lTypeface = null;
 
         try{
-            typeface = Typeface.createFromAsset(this.getAssets(),"fonts/Pacifico.ttf");
+            lTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/Pacifico.ttf");
         }catch (Exception e){
             e.printStackTrace();
-            typeface = Typeface.defaultFromStyle(Typeface.ITALIC);
+            lTypeface = Typeface.defaultFromStyle(Typeface.ITALIC);
         }
 
-        tvSplash.setTypeface(typeface);
+        tvSplash.setTypeface(lTypeface);
 
         new Handler().postDelayed(new Runnable() {
             @Override

@@ -5,29 +5,29 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import static com.mynote.utils.Constants.MAIN_DATABASE_NAME;
-import static com.mynote.utils.Constants.MAIN_DATABASE_VERSION;
+import static com.mynote.utils.Constants.DATABASE_NAME;
+import static com.mynote.utils.Constants.DATABASE_VERSION;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public DatabaseHelper(Context context) {
-        super(context, MAIN_DATABASE_NAME, null, MAIN_DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(SQLiteDatabase pDb) {
 
         Log.d(this + "", "onCreate is called");
-        NotesTable.createTable(db);
+        NotesTable.createTable(pDb);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase pDb, int pOldVersion, int pNewVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + MAIN_DATABASE_NAME);
-        onCreate(db);
+        pDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
+        onCreate(pDb);
 
     }
 }

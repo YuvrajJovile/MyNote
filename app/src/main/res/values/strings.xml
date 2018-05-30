@@ -20,4 +20,6 @@
     <string name="enter_a_description">Enter a description</string>
     <string name="no_title">No Title</string>
     <string name="cancel">Cancel</string>
+    <string name="remainder_canceled">Remainder Canceled</string>
+    <string name="remainder_set">Remainder Set</string>
 </resources>

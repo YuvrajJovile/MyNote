@@ -13,9 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -63,7 +60,7 @@ import static com.mynote.utils.Constants.POTRAIT;
 
 public class AddNotesActivity extends AppCompatActivity {
 
-    private EditText etTitle, etDescription;
+    private EditText mEtTitle, mEtDescription;
 
     private ImageButton mIbDelete, mIbFavorites, mIbRemainder, mIbShare;
 
@@ -76,7 +73,7 @@ public class AddNotesActivity extends AppCompatActivity {
     private RadioGroup mRgColorGroup;
 
 
-    private String flagEditOrCreate = null;
+    private String mFlagEditOrCreate = null;
     private NotesTable mNotesTable;
 
     private boolean mFlagSwitchFavorites = false;
@@ -99,7 +96,7 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private boolean mFlagChangesMade = false;
 
-    private NotesModel mNotesModel;
+    private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a");
 
 
     @Override
@@ -107,22 +104,23 @@ public class AddNotesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_notes);
         mToast = new Toast(this);
-        etTitle = findViewById(R.id.et_title);
-        etDescription = findViewById(R.id.et_description);
+        mEtTitle = findViewById(R.id.et_title);
+        mEtDescription = findViewById(R.id.et_description);
         mProgressBar = findViewById(R.id.v_progress);
         mtvDateModified = findViewById(R.id.tv_date_modified);
         mtvRemainder = findViewById(R.id.tv_remainder);
         mIbBack = findViewById(R.id.ib_back);
-        mNotesTable = new NotesTable(this);
-
-
         mIbDelete = findViewById(R.id.ib_delete);
         mIbFavorites = findViewById(R.id.ib_favourites);
         mIbRemainder = findViewById(R.id.ib_remainder);
         mIbShare = findViewById(R.id.ib_share);
-
         mRgColorGroup = findViewById(R.id.rg_color_group);
 
+        init();
+
+    }
+
+    private void init() {
 
         mAlarmCalandar = Calendar.getInstance();
 
@@ -136,27 +134,29 @@ public class AddNotesActivity extends AppCompatActivity {
         });
 
 
-        final Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
+        mNotesTable = new NotesTable(this);
 
-            flagEditOrCreate = bundle.getString(EDIT_OR_CREATE_OR_DELETE);
+        final Bundle lBundle = getIntent().getExtras();
+        if (lBundle != null) {
+
+            mFlagEditOrCreate = lBundle.getString(EDIT_OR_CREATE_OR_DELETE);
 
 
-            if (flagEditOrCreate.equals(EDIT)) {
+            if (mFlagEditOrCreate.equals(EDIT)) {
 
                 mIbDelete.setVisibility(View.VISIBLE);
 
-                String titleString = bundle.getString(DATA_TITLE);
-                if (titleString.isEmpty() || titleString.length() == 0 || titleString.equals(""))
-                    titleString = "No Title";
-                etTitle.setText(titleString);
-                etDescription.setText(bundle.getString(DATA_DES));
-                mChordColor = bundle.getString(CHORD_COLOR);
-                mCreatedOrModified = bundle.getString(COLUMN_CREATED_OR_MODIFIED);
-                mFlagSwitchFavorites = Boolean.parseBoolean(bundle.getString(COLUMN_FAVORITE));
+                String lTitleString = lBundle.getString(DATA_TITLE);
+                if (lTitleString.isEmpty() || lTitleString.length() == 0 || lTitleString.equals(""))
+                    lTitleString = "No Title";
+                mEtTitle.setText(lTitleString);
+                mEtDescription.setText(lBundle.getString(DATA_DES));
+                mChordColor = lBundle.getString(CHORD_COLOR);
+                mCreatedOrModified = lBundle.getString(COLUMN_CREATED_OR_MODIFIED);
+                mFlagSwitchFavorites = Boolean.parseBoolean(lBundle.getString(COLUMN_FAVORITE));
 
 
-                mRemainderTime = Long.parseLong(bundle.getString(COLUMN_REMAINDER_TIME));
+                mRemainderTime = Long.parseLong(lBundle.getString(COLUMN_REMAINDER_TIME));
 
                 if (mRemainderTime < mAlarmCalandar.getTimeInMillis()) {
                     mRemainderTime = -1;
@@ -171,8 +171,9 @@ public class AddNotesActivity extends AppCompatActivity {
 
                     int hour = mAlarmCalandar.get(Calendar.HOUR);
                     hour = (hour == 0) ? 12 : hour;
-                    mtvRemainder.setText("Remainder set on: " + mAlarmCalandar.get(Calendar.DAY_OF_MONTH) + "/" + (mAlarmCalandar.get(Calendar.MONTH) + 1)
-                            + "/" + mAlarmCalandar.get(Calendar.YEAR) + "\t" + hour + ":" + mAlarmCalandar.get(Calendar.MINUTE));
+                    String lRemainderText = "Remainder set on: " + mAlarmCalandar.get(Calendar.DAY_OF_MONTH) + "/" + (mAlarmCalandar.get(Calendar.MONTH) + 1)
+                            + "/" + mAlarmCalandar.get(Calendar.YEAR) + "\t" + hour + ":" + mAlarmCalandar.get(Calendar.MINUTE);
+                    mtvRemainder.setText(lRemainderText);
 
                 }
 
@@ -207,23 +208,23 @@ public class AddNotesActivity extends AppCompatActivity {
                 }
 
 
-                if (id != 0)
+                if (id != 0 || id != -1)
                     mRgColorGroup.check(id);
 
 
-                String dateString = bundle.getString(DATA_DATE);
-                SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM \thh:mm a");
-                SimpleDateFormat inputFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a");
+                String lDateString = lBundle.getString(DATA_DATE);
+                SimpleDateFormat lOutputFormat = new SimpleDateFormat("dd MMM \thh:mm a");
+
                 try {
-                    Date date = inputFormat.parse(dateString);
-                    dateString = outputFormat.format(date);
+                    Date lDate = mSimpleDateFormat.parse(lDateString);
+                    lDateString = lOutputFormat.format(lDate);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
 
-                String modifiedTitle = ((mCreatedOrModified.equals(MODIFIED)) ? getString(R.string.last_modified) : getString(R.string.created_at)) + dateString;
-                mtvDateModified.setText(modifiedTitle);
-                mID = Integer.parseInt(bundle.getString(DATA_ID));
+                String lModifiedTitle = ((mCreatedOrModified.equals(MODIFIED)) ? getString(R.string.last_modified) : getString(R.string.created_at)) + lDateString;
+                mtvDateModified.setText(lModifiedTitle);
+                mID = Integer.parseInt(lBundle.getString(DATA_ID));
                 Log.d(this + "", "id==" + mID);
             }
 
@@ -319,7 +320,7 @@ public class AddNotesActivity extends AppCompatActivity {
         });
 
 
-        etDescription.addTextChangedListener(new TextWatcher() {
+        mEtDescription.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -335,14 +336,13 @@ public class AddNotesActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void ShowRemaiderEditDialog() {
 
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Edit/Delete Remainder");
-        dialog.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
+        AlertDialog.Builder lDialog = new AlertDialog.Builder(this);
+        lDialog.setTitle("Edit/Delete Remainder");
+        lDialog.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 performOnClickRemainder();
@@ -361,7 +361,7 @@ public class AddNotesActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 }).create();
-        dialog.show();
+        lDialog.show();
     }
 
     private void cancelRemainder() {
@@ -378,7 +378,7 @@ public class AddNotesActivity extends AppCompatActivity {
             mFlagChangesMade = true;
 
 
-            showMessage("Remainder Canceled");
+            showMessage(getString(R.string.remainder_canceled));
 
         }
     }
@@ -400,7 +400,7 @@ public class AddNotesActivity extends AppCompatActivity {
     private void performOnClickRemainder() {
 
 
-        TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+        TimePickerDialog.OnTimeSetListener lOnTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
@@ -410,10 +410,10 @@ public class AddNotesActivity extends AppCompatActivity {
                 setOrEditAlarm(mAlarmCalandar);
             }
         };
-        final TimePickerDialog timePickerDialog = new TimePickerDialog(this, onTimeSetListener, mAlarmCalandar.get(Calendar.HOUR_OF_DAY), mAlarmCalandar.get(Calendar.MINUTE), false);
+        final TimePickerDialog lTimePickerDialog = new TimePickerDialog(this, lOnTimeSetListener, mAlarmCalandar.get(Calendar.HOUR_OF_DAY), mAlarmCalandar.get(Calendar.MINUTE), false);
 
 
-        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+        DatePickerDialog.OnDateSetListener lOnDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
@@ -421,59 +421,57 @@ public class AddNotesActivity extends AppCompatActivity {
                 mAlarmCalandar.set(Calendar.MONTH, month);
                 mAlarmCalandar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 flagDateSelected = true;
-                timePickerDialog.show();
+                lTimePickerDialog.show();
             }
         };
 
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, onDateSetListener, mAlarmCalandar.get(Calendar.YEAR), mAlarmCalandar.get(Calendar.MONTH), mAlarmCalandar.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
-        datePickerDialog.show();
+        DatePickerDialog lDatePickerDialog = new DatePickerDialog(this, lOnDateSetListener, mAlarmCalandar.get(Calendar.YEAR), mAlarmCalandar.get(Calendar.MONTH), mAlarmCalandar.get(Calendar.DAY_OF_MONTH));
+        lDatePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+        lDatePickerDialog.show();
 
 
     }
 
 
-    private void setOrEditAlarm(Calendar mAlarmCalandar) {
+    private void setOrEditAlarm(Calendar pAlarmCalendar) {
 
         mFlagChangesMade = true;
-        String title = etTitle.getText().toString().isEmpty() ? getString(R.string.no_title) : etTitle.getText().toString();
-        String des = etDescription.getText().toString();
+        String lTitle = mEtTitle.getText().toString().isEmpty() ? getString(R.string.no_title) : mEtTitle.getText().toString();
+        String lDes = mEtDescription.getText().toString();
 
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a");
+        String lTimeStamp = mSimpleDateFormat.format(new Date());
 
-
-        String timeStamp = simpleDateFormat.format(new Date());
-
-        if (flagEditOrCreate.equals(EDIT))
+        if (mFlagEditOrCreate.equals(EDIT))
             mCreatedOrModified = MODIFIED;
 
 
-        mRemainderTime = mAlarmCalandar.getTimeInMillis();
-        NotesModel notesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
+        mRemainderTime = pAlarmCalendar.getTimeInMillis();
+        NotesModel lNotesModel = new NotesModel(mID, lTitle, lDes, lTimeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
 
-        new PerformUpdate().doInBackground(notesModel);
+        new PerformUpdate().doInBackground(lNotesModel);
         mtvRemainder.setVisibility(View.VISIBLE);
 
 
-        int hour = mAlarmCalandar.get(Calendar.HOUR);
+        int hour = pAlarmCalendar.get(Calendar.HOUR);
         hour = (hour == 0) ? 12 : hour;
 
-        mtvRemainder.setText("Remainder set on: " + mAlarmCalandar.get(Calendar.DAY_OF_MONTH) + "/" + (mAlarmCalandar.get(Calendar.MONTH) + 1)
-                + "/" + mAlarmCalandar.get(Calendar.YEAR) + "\t" + hour + ":" + mAlarmCalandar.get(Calendar.MINUTE));
+        String lRemainderText = "Remainder set on: " + pAlarmCalendar.get(Calendar.DAY_OF_MONTH) + "/" + (pAlarmCalendar.get(Calendar.MONTH) + 1)
+                + "/" + pAlarmCalendar.get(Calendar.YEAR) + "\t" + hour + ":" + pAlarmCalendar.get(Calendar.MINUTE);
+        mtvRemainder.setText(lRemainderText);
 
 
         if (mPendingIntent != null) {
             mAlarmManager.cancel(mPendingIntent);
         }
 
-        Intent intent = new Intent(this, RemainderBroadcast.class);
-        intent.putExtra("id", mID);
-        mPendingIntent = PendingIntent.getBroadcast(this, (int) mID, intent, 0);
-        mAlarmManager.set(AlarmManager.RTC, mAlarmCalandar.getTimeInMillis(), mPendingIntent);
+        Intent lIntent = new Intent(this, RemainderBroadcast.class);
+        lIntent.putExtra("id", mID);
+        mPendingIntent = PendingIntent.getBroadcast(this, (int) mID, lIntent, 0);
+        mAlarmManager.set(AlarmManager.RTC, pAlarmCalendar.getTimeInMillis(), mPendingIntent);
         mRemainderSet = true;
-        showMessage("Remainder Set");
+        showMessage(getString(R.string.remainder_set));
         mIbRemainder.setSelected(true);
     }
 
@@ -493,14 +491,14 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private void performShare() {
 
-        String title = etTitle.getText().toString();
-        title = (title.isEmpty() || title == null) ? getString(R.string.no_title) : title;
-        String dataToShare = getString(R.string.share_title) + title + getString(R.string.share_description) + etDescription.getText().toString();
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, dataToShare);
-        sendIntent.setType("text/plain");
-        startActivity(sendIntent);
+        String lTitle = mEtTitle.getText().toString();
+        lTitle = (lTitle.isEmpty() || lTitle == null) ? getString(R.string.no_title) : lTitle;
+        String lDataToShare = getString(R.string.share_title) + lTitle + getString(R.string.share_description) + mEtDescription.getText().toString();
+        Intent lSendIntent = new Intent();
+        lSendIntent.setAction(Intent.ACTION_SEND);
+        lSendIntent.putExtra(Intent.EXTRA_TEXT, lDataToShare);
+        lSendIntent.setType("text/plain");
+        startActivity(lSendIntent);
 
     }
 
@@ -512,29 +510,28 @@ public class AddNotesActivity extends AppCompatActivity {
 
             mProgressBar.setVisibility(View.VISIBLE);
 
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a");
+
+            String lTitle = mEtTitle.getText().toString();
+            lTitle = lTitle.isEmpty() || lTitle.equals("") ? getString(R.string.no_title) : lTitle;
+            String lDes = mEtDescription.getText().toString();
+            String lTimeStamp = mSimpleDateFormat.format(new Date());
+            String lCreateOrEdit = CREATE;
 
 
-            String title = etTitle.getText().toString();
-            title = title.isEmpty() || title.equals("") ? getString(R.string.no_title) : title;
-            String des = etDescription.getText().toString();
-            String timeStamp = simpleDateFormat.format(new Date());
-            String createOrEdit = CREATE;
+            Intent lIntent = new Intent();
+            Bundle lBundleReturn = new Bundle();
 
 
-            Intent intent = new Intent();
-            Bundle bundleReturn = new Bundle();
-
-
-            if (flagEditOrCreate.equals(EDIT)) {
+            NotesModel lNotesModel;
+            if (mFlagEditOrCreate.equals(EDIT)) {
                 mCreatedOrModified = MODIFIED;
-                mNotesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
-                new PerformUpdate().doInBackground(mNotesModel);
-                createOrEdit = EDIT;
+                lNotesModel = new NotesModel(mID, lTitle, lDes, lTimeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
+                new PerformUpdate().doInBackground(lNotesModel);
+                lCreateOrEdit = EDIT;
             } else {
                 mCreatedOrModified = CREATED;
-                mNotesModel = new NotesModel(mID, title, des, timeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
-                mID = new PerformInsert().doInBackground(mNotesModel);
+                lNotesModel = new NotesModel(mID, lTitle, lDes, lTimeStamp, mChordColor, mCreatedOrModified, mFlagSwitchFavorites, mRemainderTime);
+                mID = new PerformInsert().doInBackground(lNotesModel);
             }
 
 
@@ -544,17 +541,17 @@ public class AddNotesActivity extends AppCompatActivity {
             Log.d(this + "", "id==" + mID);
 
 
-            bundleReturn.putString(EDIT_OR_CREATE_OR_DELETE, createOrEdit);
-            bundleReturn.putString(DATA_ID, mID + "");
-            bundleReturn.putString(DATA_TITLE, title);
-            bundleReturn.putString(DATA_DES, des);
-            bundleReturn.putString(DATA_DATE, timeStamp);
-            bundleReturn.putString(CHORD_COLOR, mChordColor);
-            bundleReturn.putString(COLUMN_CREATED_OR_MODIFIED, mCreatedOrModified);
-            bundleReturn.putString(COLUMN_FAVORITE, mFlagSwitchFavorites + "");
-            bundleReturn.putString(COLUMN_REMAINDER_TIME, mRemainderTime + "");
-            intent.putExtras(bundleReturn);
-            setResult(RESULT_OK, intent);
+            lBundleReturn.putString(EDIT_OR_CREATE_OR_DELETE, lCreateOrEdit);
+            lBundleReturn.putString(DATA_ID, mID + "");
+            lBundleReturn.putString(DATA_TITLE, lTitle);
+            lBundleReturn.putString(DATA_DES, lDes);
+            lBundleReturn.putString(DATA_DATE, lTimeStamp);
+            lBundleReturn.putString(CHORD_COLOR, mChordColor);
+            lBundleReturn.putString(COLUMN_CREATED_OR_MODIFIED, mCreatedOrModified);
+            lBundleReturn.putString(COLUMN_FAVORITE, mFlagSwitchFavorites + "");
+            lBundleReturn.putString(COLUMN_REMAINDER_TIME, mRemainderTime + "");
+            lIntent.putExtras(lBundleReturn);
+            setResult(RESULT_OK, lIntent);
             finish();
         } else {
             super.onBackPressed();
@@ -562,31 +559,11 @@ public class AddNotesActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
 
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_items, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.menu_delete:
-                if (!flagEditOrCreate.equals(CREATE))
-                    performDelete();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-
-        }
-    }
 
     private void performDelete() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(AddNotesActivity.this);
-        builder.setMessage(R.string.delete)
+        final AlertDialog.Builder lBuilder = new AlertDialog.Builder(AddNotesActivity.this);
+        lBuilder.setMessage(R.string.delete)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -599,13 +576,13 @@ public class AddNotesActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 }).create();
-        builder.show();
+        lBuilder.show();
     }
 
 
     private boolean validate() {
 
-        return etDescription.getText().toString().length() > 0;
+        return mEtDescription.getText().toString().length() > 0;
     }
 
     private void showMessage(String pData) {
@@ -700,11 +677,11 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private void navigateToMain() {
 
-        Intent intent = new Intent();
-        Bundle bundleReturn = new Bundle();
-        bundleReturn.putString(EDIT_OR_CREATE_OR_DELETE, DELETE);
-        intent.putExtras(bundleReturn);
-        setResult(RESULT_OK, intent);
+        Intent lIntent = new Intent();
+        Bundle lBundleReturn = new Bundle();
+        lBundleReturn.putString(EDIT_OR_CREATE_OR_DELETE, DELETE);
+        lIntent.putExtras(lBundleReturn);
+        setResult(RESULT_OK, lIntent);
         finish();
     }
 }

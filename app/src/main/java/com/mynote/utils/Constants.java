@@ -21,10 +21,6 @@ public class Constants {
     public static String EDIT_OR_CREATE_OR_DELETE = "edit_or_create_del";
 
 
-    public static int MAIN_DATABASE_VERSION = 1;
-    public static String MAIN_DATABASE_NAME = "main_database";
-
-
     public static int DATABASE_VERSION = 1;
     public static String DATABASE_NAME = "notes_db";
 
