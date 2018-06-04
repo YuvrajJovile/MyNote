@@ -13,12 +13,14 @@ public class Constants {
     public static String CREATE = "create";
     public static String DELETE = "delete";
 
-    public static String DATA_TITLE = "data_title";
-    public static String DATA_DES = "data_des";
-    public static String DATA_DATE = "data_date";
-    public static String DATA_ID = "data_id";
+    public static int CREATE_CODE = 200;
+    public static int EDIT_CODE = 201;
+    public static int DELETE_CODE = 202;
+
     public static String EDIT_OR_CREATE_OR_DELETE = "edit_or_create_del";
 
+
+    public static String NOTES_DATA = "notes_data";
 
     public static int DATABASE_VERSION = 1;
     public static String DATABASE_NAME = "notes_db";
@@ -26,15 +28,13 @@ public class Constants {
     public static String TABLE_NAME = "notes";
     public static String COLUMN_ID = "id";
     public static String COLUMN_NOTE_TITLE = "note_title";
-    public static String COLUMN_NOTE_DESRIPTION = "note_description";
+    public static String COLUMN_NOTE_DESCRIPTION = "note_description";
     public static String COLUMN_TIMESTAMP = "timestamp";
     public static String COLUMN_COLOR = "color";
     public static String COLUMN_CREATED_OR_MODIFIED = "created_or_modified";
     public static String COLUMN_FAVORITE = "favorite";
     public static String COLUMN_REMAINDER_TIME = "remainder_time";
 
-
-    public static String CHORD_COLOR = "chord_color";
 
     public static String COLOR_DEFAULT = "#ffffff";
 
@@ -50,11 +50,7 @@ public class Constants {
     public static String MODIFIED = "modified";
 
 
-    public static int POTRAIT = 1;
     public static int LANDSCAPE = 2;
-
-
-
 
 
 }

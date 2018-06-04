@@ -55,6 +55,7 @@
         android:layout_below="@+id/tv_title"
         android:background="@null"
         android:ems="10"
+        android:focusableInTouchMode="true"
         android:hint="Enter a title"
         android:imeOptions="actionNext"
         android:inputType="text|textCapSentences"
@@ -107,7 +108,8 @@
         android:id="@+id/v_tools_lay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/v_color_palette"
+        android:layout_above="@id/v_color_palette"
+        android:layout_marginBottom="8dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="4dp">
@@ -165,29 +167,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         android:orientation="vertical">
 
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.5dp"
             android:layout_marginTop="8dp"
             android:background="@color/colorRed" />
 
         <TextView
+            android:id="@+id/tv_card_color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/select_color_drawable"
+            android:letterSpacing="0.2"
+            android:padding="8dp"
             android:paddingBottom="4dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingTop="4dp"
             android:text="@string/select_color"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorRedDark"
-            android:textSize="12sp" />
+            android:textColor="@color/colorRed"
+            android:textSize="10sp" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -199,7 +203,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="8dp">

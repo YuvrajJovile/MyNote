@@ -12,37 +12,30 @@
         android:roundIcon="@drawable/notepad"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".view.MainActivity"
-            android:singleUser="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+
+        <activity android:name=".view.MainActivity" />
+
+
         <activity
             android:name=".view.AddNotesActivity"
             android:parentActivityName=".view.MainActivity"
             android:screenOrientation="portrait"
-            android:singleUser="true"
-            android:windowSoftInputMode="adjustNothing" />
-        <activity android:name=".view.SplashActivity">
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".view.SplashActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.RemainderService"
-            android:enabled="true" />
+        <service android:name=".service.RemainderService" />
 
         <receiver android:name=".broadcast.RemainderBroadcast" />
 
-
-        <service
-            android:name=".service.DeleteRemainderService"
-            android:enabled="true" />
+        <service android:name=".service.DeleteRemainderService" />
 
         <receiver android:name=".broadcast.DismissNotificationBroadcast" />
 

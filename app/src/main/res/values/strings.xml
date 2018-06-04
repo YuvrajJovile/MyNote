@@ -12,7 +12,7 @@
 
     <string name="title">Title</string>
     <string name="des">Description</string>
-    <string name="select_color">Select Chord Color</string>
+    <string name="select_color">Select Card Color</string>
     <string name="last_modified">Last Modified\n</string>
     <string name="created_at">Created at\n</string>
     <string name="share_title">Hey, Check MyNote:-\nTitle:</string>

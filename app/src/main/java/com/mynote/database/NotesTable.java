@@ -15,7 +15,7 @@ import static com.mynote.utils.Constants.COLUMN_COLOR;
 import static com.mynote.utils.Constants.COLUMN_CREATED_OR_MODIFIED;
 import static com.mynote.utils.Constants.COLUMN_FAVORITE;
 import static com.mynote.utils.Constants.COLUMN_ID;
-import static com.mynote.utils.Constants.COLUMN_NOTE_DESRIPTION;
+import static com.mynote.utils.Constants.COLUMN_NOTE_DESCRIPTION;
 import static com.mynote.utils.Constants.COLUMN_NOTE_TITLE;
 import static com.mynote.utils.Constants.COLUMN_REMAINDER_TIME;
 import static com.mynote.utils.Constants.COLUMN_TIMESTAMP;
@@ -43,7 +43,7 @@ public class NotesTable {
             "CREATE TABLE " + TABLE_NAME + "("
                     + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + COLUMN_NOTE_TITLE + " TEXT,"
-                    + COLUMN_NOTE_DESRIPTION + " TEXT,"
+                    + COLUMN_NOTE_DESCRIPTION + " TEXT,"
                     + COLUMN_TIMESTAMP + " TEXT,"
                     + COLUMN_COLOR + " TEXT,"
                     + COLUMN_CREATED_OR_MODIFIED + " TEXT,"
@@ -62,7 +62,7 @@ public class NotesTable {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NOTE_TITLE, pNotesModel.getTitle());
-        values.put(COLUMN_NOTE_DESRIPTION, pNotesModel.getDescription());
+        values.put(COLUMN_NOTE_DESCRIPTION, pNotesModel.getDescription());
         values.put(COLUMN_TIMESTAMP, pNotesModel.getDate());
         values.put(COLUMN_COLOR, pNotesModel.getColor());
         values.put(COLUMN_CREATED_OR_MODIFIED, pNotesModel.getCreatedOrModified());
@@ -83,7 +83,7 @@ public class NotesTable {
         String[] lProjection = {
                 COLUMN_ID,
                 COLUMN_NOTE_TITLE,
-                COLUMN_NOTE_DESRIPTION,
+                COLUMN_NOTE_DESCRIPTION,
                 COLUMN_TIMESTAMP,
                 COLUMN_COLOR,
                 COLUMN_CREATED_OR_MODIFIED,
@@ -108,7 +108,7 @@ public class NotesTable {
         NotesModel lData = new NotesModel(
                 lCursor.getInt(lCursor.getColumnIndex(COLUMN_ID)),
                 lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_TITLE)),
-                lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_DESRIPTION)),
+                lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_DESCRIPTION)),
                 lCursor.getString(lCursor.getColumnIndex(COLUMN_TIMESTAMP)),
                 lCursor.getString(lCursor.getColumnIndex(COLUMN_COLOR)),
                 lCursor.getString(lCursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)),
@@ -129,8 +129,10 @@ public class NotesTable {
         String lSelectQuery = "SELECT * FROM " + TABLE_NAME + " ORDER BY " +
                 COLUMN_TIMESTAMP + " DESC";
 
-        SQLiteDatabase lDb = mDBhelper.getWritableDatabase();
+
+        SQLiteDatabase lDb = mDBhelper.getReadableDatabase();
         Cursor lCursor = lDb.rawQuery(lSelectQuery, null);
+
 
         if (lCursor.moveToFirst()) {
             do {
@@ -138,7 +140,7 @@ public class NotesTable {
                 NotesModel lNotesModel = new NotesModel();
                 lNotesModel.setId(lCursor.getInt(lCursor.getColumnIndex(COLUMN_ID)));
                 lNotesModel.setTitle(lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_TITLE)));
-                lNotesModel.setDescription(lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_DESRIPTION)));
+                lNotesModel.setDescription(lCursor.getString(lCursor.getColumnIndex(COLUMN_NOTE_DESCRIPTION)));
                 lNotesModel.setDate(lCursor.getString(lCursor.getColumnIndex(COLUMN_TIMESTAMP)));
                 lNotesModel.setColor(lCursor.getString(lCursor.getColumnIndex(COLUMN_COLOR)));
                 lNotesModel.setCreatedOrModified(lCursor.getString(lCursor.getColumnIndex(COLUMN_CREATED_OR_MODIFIED)));
@@ -174,7 +176,7 @@ public class NotesTable {
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_NOTE_TITLE, pNotesModel.getTitle());
-        values.put(COLUMN_NOTE_DESRIPTION, pNotesModel.getDescription());
+        values.put(COLUMN_NOTE_DESCRIPTION, pNotesModel.getDescription());
         values.put(COLUMN_TIMESTAMP, pNotesModel.getDate());
         values.put(COLUMN_COLOR, pNotesModel.getColor());
         values.put(COLUMN_CREATED_OR_MODIFIED, pNotesModel.getCreatedOrModified());

@@ -1,6 +1,9 @@
 package com.mynote.database.model;
 
-public class NotesModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class NotesModel implements Parcelable {
 
     private long id;
     private String title;
@@ -37,6 +40,29 @@ public class NotesModel {
         this.remainderTime = remainderTime;
     }
 
+
+    public static final Creator<NotesModel> CREATOR = new Creator<NotesModel>() {
+        @Override
+        public NotesModel createFromParcel(Parcel in) {
+            return new NotesModel(in);
+        }
+
+        @Override
+        public NotesModel[] newArray(int size) {
+            return new NotesModel[size];
+        }
+    };
+
+    protected NotesModel(Parcel in) {
+        id = in.readLong();
+        title = in.readString();
+        description = in.readString();
+        date = in.readString();
+        color = in.readString();
+        createdOrModified = in.readString();
+        favourite = in.readByte() != 0;
+        remainderTime = in.readLong();
+    }
 
     public String getTitle() {
         return title;
@@ -102,5 +128,22 @@ public class NotesModel {
 
     public void setRemainderTime(long remainderTime) {
         this.remainderTime = remainderTime;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(date);
+        dest.writeString(color);
+        dest.writeString(createdOrModified);
+        dest.writeByte((byte) (favourite ? 1 : 0));
+        dest.writeLong(remainderTime);
     }
 }

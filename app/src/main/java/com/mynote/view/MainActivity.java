@@ -1,6 +1,5 @@
 package com.mynote.view;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,28 +24,23 @@ import com.mynote.adapter.listner.INotesRecyclerListener;
 import com.mynote.database.NotesTable;
 import com.mynote.database.model.NotesModel;
 import com.mynote.utils.NotesApplication;
+import com.mynote.utils.RingToneManagerClass;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mynote.utils.Constants.CHORD_COLOR;
 import static com.mynote.utils.Constants.COLOR_GREY;
-import static com.mynote.utils.Constants.COLUMN_CREATED_OR_MODIFIED;
-import static com.mynote.utils.Constants.COLUMN_FAVORITE;
-import static com.mynote.utils.Constants.COLUMN_REMAINDER_TIME;
 import static com.mynote.utils.Constants.CREATE;
-import static com.mynote.utils.Constants.DATA_DATE;
-import static com.mynote.utils.Constants.DATA_DES;
-import static com.mynote.utils.Constants.DATA_ID;
-import static com.mynote.utils.Constants.DATA_TITLE;
-import static com.mynote.utils.Constants.DELETE;
+import static com.mynote.utils.Constants.CREATE_CODE;
+import static com.mynote.utils.Constants.DELETE_CODE;
 import static com.mynote.utils.Constants.EDIT;
+import static com.mynote.utils.Constants.EDIT_CODE;
 import static com.mynote.utils.Constants.EDIT_OR_CREATE_OR_DELETE;
 import static com.mynote.utils.Constants.ID_CREATE_OR_EDIT_OR_DELETE;
 import static com.mynote.utils.Constants.IN;
 import static com.mynote.utils.Constants.LANDSCAPE;
+import static com.mynote.utils.Constants.NOTES_DATA;
 import static com.mynote.utils.Constants.OUT;
-import static com.mynote.utils.Constants.POTRAIT;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mAddNotesImageView;
     private TextView mtvWelcome;
     private RelativeLayout mBackgroundLay;
-    private boolean mFlagCreate = false;
 
 
     private INotesRecyclerListener iNotesRecyclerListener = new INotesRecyclerListener() {
@@ -99,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     private void init() {
         mFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,19 +102,25 @@ public class MainActivity extends AppCompatActivity {
         });
         mNotesListData = new ArrayList<>();
         mNotesTable = new NotesTable(this);
-        new GetNotes().doInBackground();
+        new GetNotes().execute();
     }
 
+
+    /**
+     * To delete the particular notes data
+     *
+     * @param pNotesModel
+     */
     private void navigateToDelete(final NotesModel pNotesModel) {
 
 
-        final AlertDialog.Builder lAlBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder lAlBuilder = new AlertDialog.Builder(this);
 
         lAlBuilder.setTitle(R.string.delete);
         lAlBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                new DeleteNotes().doInBackground(pNotesModel);
+                new DeleteNotes().execute(pNotesModel);
             }
         }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             @Override
@@ -142,10 +142,23 @@ public class MainActivity extends AppCompatActivity {
 
         setOrientation();
 
+        stopAlarmIfRinging();
+
         super.onResume();
     }
 
+    private void stopAlarmIfRinging() {
+        RingToneManagerClass.getInstance().stopAlarm();
+    }
+
+
+    /**
+     * To set welcome message
+     */
+
     private void setWelcomeMessage() {
+
+
         String lLoginFlag = NotesApplication.getInstance().getLoginDetails();
         if (lLoginFlag.isEmpty() || lLoginFlag.equals(OUT)
                 ) {
@@ -161,29 +174,21 @@ public class MainActivity extends AppCompatActivity {
             mAddNotesImageView.setVisibility(View.GONE);
             mBlinkLayout.setBackground(null);
             mBackgroundLay.setBackgroundResource(0);
-
-
-            if (mNotesListData.size() < 1) {
-                mtvWelcome.setVisibility(View.VISIBLE);
-                mtvWelcome.setText(getString(R.string.add_notes));
-                mtvWelcome.setTextColor(Color.parseColor(COLOR_GREY));
-            } else {
-                mtvWelcome.setVisibility(View.GONE);
-            }
+            showAddNotesMessage();
         }
 
     }
 
+    /**
+     * To set screen orientation
+     */
     private void setOrientation() {
 
         int orientation = getResources().getConfiguration().orientation;
 
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-
-        if (orientation == POTRAIT) {
-            gridLayoutManager = new GridLayoutManager(this, 2);
-        } else if (orientation == LANDSCAPE) {
+        if (orientation == LANDSCAPE) {
             gridLayoutManager = new GridLayoutManager(this, 4);
         }
 
@@ -215,88 +220,88 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    /**
+     * Navigates to Add notes Activity to perform edit
+     *
+     * @param pData
+     */
     private void navigateToEdit(NotesModel pData) {
 
         Intent lIntent = new Intent(MainActivity.this, AddNotesActivity.class);
         Bundle lBundle = new Bundle();
         lBundle.putString(EDIT_OR_CREATE_OR_DELETE, EDIT);
-        lBundle.putString(DATA_TITLE, pData.getTitle());
-        lBundle.putString(DATA_DES, pData.getDescription());
-        lBundle.putString(DATA_DATE, pData.getDate());
-        lBundle.putString(DATA_ID, pData.getId() + "");
-        lBundle.putString(CHORD_COLOR, pData.getColor());
-        lBundle.putString(COLUMN_CREATED_OR_MODIFIED, pData.getCreatedOrModified());
-        lBundle.putString(COLUMN_FAVORITE, pData.isFavourite() + "");
-        lBundle.putString(COLUMN_REMAINDER_TIME, pData.getRemainderTime() + "");
+        lBundle.putParcelable(NOTES_DATA, pData);
         lIntent.putExtras(lBundle);
+
+
         startActivityForResult(lIntent, ID_CREATE_OR_EDIT_OR_DELETE);
 
     }
 
 
+    /**
+     * Shows a Toast message
+     *
+     * @param pData
+     */
     private void showMessage(String pData) {
         Toast.makeText(this, pData, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Navigate to Add notes Activity to add a new note
+     */
     private void navigateToAddNotesActivity() {
-        mFlagCreate = true;
         Bundle lBundle = new Bundle();
         Intent lIntent = new Intent(this, AddNotesActivity.class);
         lBundle.putString(EDIT_OR_CREATE_OR_DELETE, CREATE);
         lIntent.putExtras(lBundle);
-        startActivityForResult(lIntent, ID_CREATE_OR_EDIT_OR_DELETE);
+        startActivityForResult(lIntent, CREATE_CODE);
     }
 
+
+    /**
+     * Handles the result from Add notes activity for instant update
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ID_CREATE_OR_EDIT_OR_DELETE && resultCode == RESULT_OK && data != null && (mSelectedPos != -1 || mFlagCreate)) {
+        if (data != null) {
 
-            mFlagCreate = false;
 
             Bundle lResultBundle = data.getExtras();
-            NotesModel lNotesModel = new NotesModel();
+            NotesModel lNotesModel = null;
 
 
-            String lCreateOrEdit = null;
+            if (lResultBundle != null) {
 
-            if (lResultBundle != null)
-                lCreateOrEdit = lResultBundle.getString(EDIT_OR_CREATE_OR_DELETE);
-
-            if (lCreateOrEdit != null) {
-                if (lCreateOrEdit.equals(EDIT) || lCreateOrEdit.equals(CREATE)) {
-
-                    long id = Integer.parseInt(lResultBundle.getString(DATA_ID));
+                lNotesModel = lResultBundle.getParcelable(NOTES_DATA);
+            }
 
 
-                    Log.d(this + "", "id==" + id);
+            if (resultCode == EDIT_CODE || resultCode == CREATE_CODE) {
+                if (resultCode == EDIT_CODE) {
 
-                    lNotesModel.setId(id);
-                    lNotesModel.setTitle(lResultBundle.getString(DATA_TITLE));
-                    lNotesModel.setDescription(lResultBundle.getString(DATA_DES));
-                    lNotesModel.setDate(lResultBundle.getString(DATA_DATE));
-                    lNotesModel.setColor(lResultBundle.getString(CHORD_COLOR));
-                    lNotesModel.setCreatedOrModified(lResultBundle.getString(COLUMN_CREATED_OR_MODIFIED));
-                    lNotesModel.setFavourite(Boolean.parseBoolean(lResultBundle.getString(COLUMN_FAVORITE)));
-                    lNotesModel.setRemainderTime(Long.parseLong(lResultBundle.getString(COLUMN_REMAINDER_TIME)));
+                    for (int i = 0; i < mNotesListData.size(); i++) {
 
-                    if (lCreateOrEdit.equals(EDIT) && id != -1) {
-
-                        for (int i = 0; i < mNotesListData.size(); i++) {
-
-                            if (mNotesListData.get(i).getId() == id) {
-                                mNotesListData.remove(i);
-                                break;
-                            }
+                        if (mNotesListData.get(i).getId() == lNotesModel.getId()) {
+                            mNotesListData.remove(i);
+                            break;
                         }
-
                     }
 
+                }
 
-                    mNotesListData.add(0, lNotesModel);
 
-                    //mNotesRecyclerAdapter.notifyDataSetChanged();
+                mNotesListData.add(0, lNotesModel);
+
+                //mNotesRecyclerAdapter.notifyDataSetChanged();
                /* if (createOrEdit.equals(EDIT)) {
 
                     // mNotesRecyclerAdapter.notifyItemInserted(0);
@@ -309,69 +314,84 @@ public class MainActivity extends AppCompatActivity {
                 }*/
 
 
-                } else if (lCreateOrEdit.equals(DELETE)) {
-                    mNotesListData.remove(mSelectedPos);
-                    //mNotesRecyclerAdapter.notifyDataSetChanged();
-                    // mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
-                    // mNotesRecyclerAdapter.notifyItemRangeChanged(mSelectedPos, mNotesRecyclerAdapter.getItemCount());
-                }
+            } else if (resultCode == DELETE_CODE) {
+                mNotesListData.remove(mSelectedPos);
+                //mNotesRecyclerAdapter.notifyDataSetChanged();
+                // mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
+                // mNotesRecyclerAdapter.notifyItemRangeChanged(mSelectedPos, mNotesRecyclerAdapter.getItemCount());
             }
 
             mNotesRecyclerAdapter.notifyDataSetChanged();
-            setWelcomeMessage();
+            showAddNotesMessage();
         }
     }
 
-    @SuppressLint("StaticFieldLeak")
+    /**
+     * If the count of the card is zero i.e if there are no notes, "Add Note" Message will be displayed
+     */
+    private void showAddNotesMessage() {
+        if (mNotesListData.size() == 0) {
+            mtvWelcome.setVisibility(View.VISIBLE);
+            mtvWelcome.setText(getString(R.string.add_notes));
+            mtvWelcome.setTextColor(Color.parseColor(COLOR_GREY));
+        } else {
+            mtvWelcome.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * To get all the notes
+     */
     private class GetNotes extends AsyncTask<Void, Void, Void> {
 
 
         @Override
         protected void onPreExecute() {
             mProgressBar.setVisibility(View.VISIBLE);
-            super.onPreExecute();
+
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
             mNotesListData.clear();
             mNotesListData.addAll(mNotesTable.getAllNotes());
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void pVoid) {
             mProgressBar.setVisibility(View.GONE);
-            super.onPostExecute(pVoid);
-
+            showAddNotesMessage();
         }
     }
 
-    @SuppressLint("StaticFieldLeak")
+    /**
+     * To delete particular note
+     */
     class DeleteNotes extends AsyncTask<NotesModel, Void, Void> {
 
 
         @Override
         protected void onPreExecute() {
             mProgressBar.setVisibility(View.VISIBLE);
-            super.onPreExecute();
+
         }
 
         @Override
         protected Void doInBackground(NotesModel... pNotesModel) {
             mNotesTable.deleteNotes(pNotesModel[0].getId());
-            mNotesListData.remove(mSelectedPos);
-            mNotesRecyclerAdapter.notifyDataSetChanged();
-            showMessage(getString(R.string.note_deleted));
-            setWelcomeMessage();
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             mProgressBar.setVisibility(View.GONE);
-            super.onPostExecute(aVoid);
+            mNotesListData.remove(mSelectedPos);
+            mNotesRecyclerAdapter.notifyDataSetChanged();
+            showMessage(getString(R.string.note_deleted));
+
+            showAddNotesMessage();
+
         }
     }
 }
