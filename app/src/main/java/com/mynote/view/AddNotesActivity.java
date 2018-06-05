@@ -10,8 +10,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
@@ -49,17 +47,13 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
 
-    private ImageButton mIbFavorites;
-    private ImageButton mIbRemainder;
+    private ImageButton mIbFavorites, mIbRemainder;
 
     private TextView mtvRemainder, mTvCardColor;
 
     private Toast mToast;
 
-
     private boolean mRemainderSet = false;
-
-    private boolean mFlagChangesMade = false;
 
     private Calendar mAlarmCalender;
 
@@ -68,8 +62,6 @@ public class AddNotesActivity extends AppCompatActivity {
     private AlarmManager mAlarmManager;
 
     private NotesModel mNotesModel = new NotesModel();
-
-    private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a", Locale.ENGLISH);
 
 
     @Override
@@ -153,8 +145,6 @@ public class AddNotesActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-
-                mFlagChangesMade = true;
                 String lColor = COLOR_DEFAULT;
 
                 switch (checkedId) {
@@ -185,41 +175,6 @@ public class AddNotesActivity extends AppCompatActivity {
 
                 mNotesModel.setColor(lColor);
                 mTvCardColor.setTextColor(Color.parseColor(lColor));
-
-            }
-        });
-
-
-        mEtTitle.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mFlagChangesMade = true;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        mEtDescription.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mFlagChangesMade = true;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
 
             }
         });
@@ -285,7 +240,6 @@ public class AddNotesActivity extends AppCompatActivity {
             mRemainderSet = false;
 
             mNotesModel.setRemainderTime(-1);
-            mFlagChangesMade = true;
 
 
             showMessage(getString(R.string.remainder_canceled));
@@ -356,7 +310,6 @@ public class AddNotesActivity extends AppCompatActivity {
      */
     private void setOrEditAlarm(Calendar pAlarmCalendar) {
 
-        mFlagChangesMade = true;
         String lTitle = mEtTitle.getText().toString().isEmpty() ? getString(R.string.no_title) : mEtTitle.getText().toString();
 
 
@@ -396,7 +349,7 @@ public class AddNotesActivity extends AppCompatActivity {
      */
     private void performOnCLickFavorites() {
 
-        mFlagChangesMade = true;
+
         if (mIbFavorites.isSelected()) {
             mIbFavorites.setSelected(false);
         } else {
@@ -435,13 +388,14 @@ public class AddNotesActivity extends AppCompatActivity {
 
         showLog("OnBackPressed");
 
-        if (validate() && mFlagChangesMade) {
+        if (validate()) {
 
 
             String lTitle = mEtTitle.getText().toString();
             lTitle = lTitle.isEmpty() || lTitle.equals("") ? getString(R.string.no_title) : lTitle;
             String lDes = mEtDescription.getText().toString();
-            String lTimeStamp = mSimpleDateFormat.format(new Date());
+            SimpleDateFormat lSimpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a", Locale.ENGLISH);
+            String lTimeStamp = lSimpleDateFormat.format(new Date());
 
 
             Intent lIntent = new Intent();

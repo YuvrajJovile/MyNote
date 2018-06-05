@@ -69,7 +69,7 @@ public class NotesTable {
         values.put(COLUMN_FAVORITE, pNotesModel.isFavourite() + "");
         values.put(COLUMN_REMAINDER_TIME, pNotesModel.getRemainderTime());
 
-        long id = lSqLiteDatabase.insert(TABLE_NAME, null, values);
+        long id = lSqLiteDatabase.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         lSqLiteDatabase.close();
         return id;
     }
@@ -175,7 +175,7 @@ public class NotesTable {
         SQLiteDatabase db = mDBhelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        //values.put(COLUMN_ID, pNotesModel.getId());
+
         values.put(COLUMN_NOTE_TITLE, pNotesModel.getTitle());
         values.put(COLUMN_NOTE_DESCRIPTION, pNotesModel.getDescription());
         values.put(COLUMN_TIMESTAMP, pNotesModel.getDate());
@@ -189,8 +189,6 @@ public class NotesTable {
         db.update(TABLE_NAME, values, selection, selectionArgs);
 
 
-        //db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        //db.insert(TABLE_NAME, null, values);
         db.close();
 
 
