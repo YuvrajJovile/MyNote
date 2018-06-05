@@ -1,6 +1,5 @@
 package com.mynote.view;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
@@ -8,7 +7,6 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +17,6 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -27,11 +24,9 @@ import android.widget.Toast;
 
 import com.mynote.R;
 import com.mynote.broadcast.RemainderBroadcast;
-import com.mynote.database.NotesTable;
 import com.mynote.model.NotesModel;
 import com.mynote.utils.RingToneManagerClass;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -46,11 +41,6 @@ import static com.mynote.utils.Constants.COLOR_PINK;
 import static com.mynote.utils.Constants.COLOR_VIOLET;
 import static com.mynote.utils.Constants.CREATED;
 import static com.mynote.utils.Constants.CREATE_CODE;
-import static com.mynote.utils.Constants.DELETE_CODE;
-import static com.mynote.utils.Constants.EDIT;
-import static com.mynote.utils.Constants.EDIT_CODE;
-import static com.mynote.utils.Constants.EDIT_OR_CREATE_OR_DELETE;
-import static com.mynote.utils.Constants.MODIFIED;
 import static com.mynote.utils.Constants.NOTES_DATA;
 
 public class AddNotesActivity extends AppCompatActivity {
@@ -59,19 +49,13 @@ public class AddNotesActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
 
-    private ImageButton mIbDelete, mIbFavorites, mIbRemainder, mIbShare;
+    private ImageButton mIbFavorites;
+    private ImageButton mIbRemainder;
 
-    private TextView mtvDateModified, mtvRemainder, mTvCardColor;
+    private TextView mtvRemainder, mTvCardColor;
+
     private Toast mToast;
-    private long mID = -1;
-    private ProgressBar mProgressBar;
-    private ImageButton mIbBack;
 
-    private RadioGroup mRgColorGroup;
-
-    private String mFlagEditOrCreate = null;
-
-    private NotesTable mNotesTable;
 
     private boolean mRemainderSet = false;
 
@@ -80,10 +64,10 @@ public class AddNotesActivity extends AppCompatActivity {
     private Calendar mAlarmCalender;
 
     private PendingIntent mPendingIntent;
+
     private AlarmManager mAlarmManager;
 
-
-    private NotesModel mNotesModel = null;
+    private NotesModel mNotesModel = new NotesModel();
 
     private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd:MMM:yyyy hh:mm:ss a", Locale.ENGLISH);
 
@@ -95,159 +79,39 @@ public class AddNotesActivity extends AppCompatActivity {
         mToast = new Toast(this);
         mEtTitle = findViewById(R.id.et_title);
         mEtDescription = findViewById(R.id.et_description);
-        mProgressBar = findViewById(R.id.v_progress);
-        mtvDateModified = findViewById(R.id.tv_date_modified);
+
         mtvRemainder = findViewById(R.id.tv_remainder);
-        mIbBack = findViewById(R.id.ib_back);
-        mIbDelete = findViewById(R.id.ib_delete);
+
         mIbFavorites = findViewById(R.id.ib_favourites);
         mIbRemainder = findViewById(R.id.ib_remainder);
-        mIbShare = findViewById(R.id.ib_share);
-        mRgColorGroup = findViewById(R.id.rg_color_group);
         mTvCardColor = findViewById(R.id.tv_card_color);
 
+        ImageButton lIbShare = findViewById(R.id.ib_share);
+        ImageButton lIbBack = findViewById(R.id.ib_back);
+        RadioGroup lRgColorGroup = findViewById(R.id.rg_color_group);
 
-        init();
 
-    }
+        mEtTitle.setCursorVisible(false);
+        mEtTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEtTitle.setCursorVisible(true);
+            }
+        });
 
-    private void init() {
 
         mAlarmCalender = Calendar.getInstance();
 
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-        mIbBack.setOnClickListener(new View.OnClickListener() {
+        lIbBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
-
-        mNotesTable = new NotesTable(this);
-
-        final Bundle lBundle = getIntent().getExtras();
-        if (lBundle != null) {
-
-
-            mFlagEditOrCreate = lBundle.getString(EDIT_OR_CREATE_OR_DELETE);
-
-
-            if (mFlagEditOrCreate != null && mFlagEditOrCreate.equals(EDIT)) {
-
-
-                mIbDelete.setVisibility(View.VISIBLE);
-
-                mNotesModel = lBundle.getParcelable(NOTES_DATA);
-
-                mID = mNotesModel.getId();
-
-                String lTitleString = mNotesModel.getTitle();
-                if (lTitleString == null || lTitleString.length() == 0)
-                    lTitleString = "No Title";
-                mEtTitle.setText(lTitleString);
-                mEtTitle.setSelection(lTitleString.length());
-
-                mEtDescription.setText(mNotesModel.getDescription());
-
-
-                long lRemainderTime = mNotesModel.getRemainderTime();
-
-                if (lRemainderTime < mAlarmCalender.getTimeInMillis()) {
-                    mNotesModel.setRemainderTime(-1);
-                    mRemainderSet = false;
-                    mIbRemainder.setSelected(false);
-
-                } else {
-                    mRemainderSet = true;
-                    mIbRemainder.setSelected(true);
-                    mtvRemainder.setVisibility(View.VISIBLE);
-                    mAlarmCalender.setTimeInMillis(lRemainderTime);
-
-                    int hour = mAlarmCalender.get(Calendar.HOUR);
-                    hour = (hour == 0) ? 12 : hour;
-                    String lRemainderText = "Remainder set on: " + mAlarmCalender.get(Calendar.DAY_OF_MONTH) + "/" + (mAlarmCalender.get(Calendar.MONTH) + 1)
-                            + "/" + mAlarmCalender.get(Calendar.YEAR) + "\t" + hour + ":" + mAlarmCalender.get(Calendar.MINUTE);
-                    mtvRemainder.setText(lRemainderText);
-
-                }
-
-                if (mNotesModel.isFavourite()) {
-                    mIbFavorites.setSelected(true);
-                } else {
-                    mIbFavorites.setSelected(false);
-                }
-
-
-                int id = -1;
-
-                String lCardColor = mNotesModel.getColor();
-
-                mTvCardColor.setTextColor(Color.parseColor(lCardColor));
-
-                if (lCardColor.equals(COLOR_DEFAULT)) {
-                    id = 0;
-                } else if (lCardColor.equals(COLOR_GREEN)) {
-                    id = R.id.rb_green;
-                } else if (lCardColor.equals(COLOR_GREEN_LIGHT)) {
-                    id = R.id.rb_green_light;
-                } else if (lCardColor.equals(COLOR_BLUE)) {
-                    id = R.id.rb_color_blue;
-                } else if (lCardColor.equals(COLOR_VIOLET)) {
-                    id = R.id.rb_color_violet;
-                } else if (lCardColor.equals(COLOR_PINK)) {
-                    id = R.id.rb_color_pink;
-                } else if (lCardColor.equals(COLOR_ORANGE)) {
-                    id = R.id.rb_color_orange;
-                }
-
-
-                if (id != 0)
-                    mRgColorGroup.check(id);
-
-
-                String lDateString = mNotesModel.getDate();
-                SimpleDateFormat lOutputFormat;
-                lOutputFormat = new SimpleDateFormat("dd MMM \thh:mm a", Locale.ENGLISH);
-
-                try {
-                    Date lDate = mSimpleDateFormat.parse(lDateString);
-                    lDateString = lOutputFormat.format(lDate);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                String lModifiedTitle = ((mNotesModel.getCreatedOrModified().equals(MODIFIED)) ? getString(R.string.last_modified) : getString(R.string.created_at)) + lDateString;
-                mtvDateModified.setText(lModifiedTitle);
-
-                Log.d(this + "", "id==" + mID);
-            } else {
-                mNotesModel = new NotesModel();
-                mNotesModel.setRemainderTime(-1);
-                mNotesModel.setColor(COLOR_DEFAULT);
-                mNotesModel.setCreatedOrModified(CREATED);
-                mNotesModel.setFavourite(false);
-            }
-
-
-            if (mNotesModel.getRemainderTime() != -1) {
-                Intent intent = new Intent(this, RemainderBroadcast.class);
-                mPendingIntent = PendingIntent.getBroadcast(this, (int) mID, intent, 0);
-            }
-        }
-
-
-        mIbDelete.setOnClickListener(new View.OnClickListener()
-
-        {
-            @Override
-            public void onClick(View v) {
-                performDelete();
-            }
-        });
-
-        mIbShare.setOnClickListener(new View.OnClickListener()
+        lIbShare.setOnClickListener(new View.OnClickListener()
 
         {
             @Override
@@ -275,13 +139,15 @@ public class AddNotesActivity extends AppCompatActivity {
 
                 if (mRemainderSet) {
                     ShowReminderEditDialog();
-                } else if (validate())
+                } else if (validate()) {
                     performOnClickRemainder();
-
+                } else {
+                    showMessage("Enter a note");
+                }
             }
         });
 
-        mRgColorGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        lRgColorGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
 
         {
             @Override
@@ -293,7 +159,6 @@ public class AddNotesActivity extends AppCompatActivity {
 
                 switch (checkedId) {
                     case R.id.rb_green:
-
                         lColor = COLOR_GREEN;
                         break;
                     case R.id.rb_green_light:
@@ -360,8 +225,17 @@ public class AddNotesActivity extends AppCompatActivity {
         });
 
 
+        mNotesModel.setColor(COLOR_DEFAULT);
+        mNotesModel.setRemainderTime(-1);
+        mNotesModel.setCreatedOrModified(CREATED);
     }
 
+
+    /**
+     * Show log.d
+     *
+     * @param pMessage custom message
+     */
     private void showLog(String pMessage) {
 
         Log.d(TAG, pMessage);
@@ -405,7 +279,7 @@ public class AddNotesActivity extends AppCompatActivity {
 
         if (mPendingIntent != null) {
             mAlarmManager.cancel(mPendingIntent);
-            mtvRemainder.setVisibility(View.GONE);
+            mtvRemainder.setVisibility(View.INVISIBLE);
 
             mIbRemainder.setSelected(false);
             mRemainderSet = false;
@@ -486,12 +360,8 @@ public class AddNotesActivity extends AppCompatActivity {
         String lTitle = mEtTitle.getText().toString().isEmpty() ? getString(R.string.no_title) : mEtTitle.getText().toString();
 
 
-        if (mFlagEditOrCreate.equals(EDIT))
-            mNotesModel.setCreatedOrModified(MODIFIED);
-
-
         mNotesModel.setRemainderTime(pAlarmCalendar.getTimeInMillis());
-        new PerformUpdate().execute(mNotesModel);
+
         mtvRemainder.setVisibility(View.VISIBLE);
 
 
@@ -508,9 +378,12 @@ public class AddNotesActivity extends AppCompatActivity {
         }
 
         Intent lIntent = new Intent(this, RemainderBroadcast.class);
-        lIntent.putExtra("id", mID);
+
+        long mId = Calendar.getInstance().getTimeInMillis();
+
+        lIntent.putExtra("id", mId);
         lIntent.putExtra("message", lTitle);
-        mPendingIntent = PendingIntent.getBroadcast(this, (int) mID, lIntent, 0);
+        mPendingIntent = PendingIntent.getBroadcast(this, (int) mId, lIntent, 0);
         mAlarmManager.set(AlarmManager.RTC, pAlarmCalendar.getTimeInMillis(), mPendingIntent);
         mRemainderSet = true;
         showMessage(getString(R.string.remainder_set));
@@ -560,9 +433,9 @@ public class AddNotesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        if (validate() && mFlagChangesMade) {
+        showLog("OnBackPressed");
 
-            mProgressBar.setVisibility(View.VISIBLE);
+        if (validate() && mFlagChangesMade) {
 
 
             String lTitle = mEtTitle.getText().toString();
@@ -574,33 +447,14 @@ public class AddNotesActivity extends AppCompatActivity {
             Intent lIntent = new Intent();
             Bundle lBundleReturn = new Bundle();
 
-            if (mNotesModel == null)
-                mNotesModel = new NotesModel();
 
-            mNotesModel.setId(mID);
+            mNotesModel.setFavourite(mIbFavorites.isSelected());
             mNotesModel.setTitle(lTitle);
             mNotesModel.setDescription(lDes);
             mNotesModel.setDate(lTimeStamp);
 
 
             int lResultCode = CREATE_CODE;
-
-            if (mFlagEditOrCreate.equals(EDIT)) {
-                lResultCode = EDIT_CODE;
-                mNotesModel.setCreatedOrModified(MODIFIED);
-                new PerformUpdate().execute(mNotesModel);
-
-            } else {
-
-                mNotesModel.setCreatedOrModified(CREATED);
-                new PerformInsert().execute(mNotesModel);
-            }
-
-
-            mProgressBar.setVisibility(View.GONE);
-
-
-            Log.d(this + "", "id==" + mID);
 
 
             lBundleReturn.putParcelable(NOTES_DATA, mNotesModel);
@@ -615,53 +469,18 @@ public class AddNotesActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * To confirm the note to be deleted
-     */
-    private void performDelete() {
-        final AlertDialog.Builder lBuilder = new AlertDialog.Builder(AddNotesActivity.this);
-        lBuilder.setMessage(R.string.delete)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new PerformDelete().execute();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create();
-        lBuilder.show();
-    }
-
-
-    /**
-     * validates for empty description
-     *
-     * @return
-     */
     private boolean validate() {
-
 
         String lDes = mEtDescription.getText().toString();
 
-        //check for white space
-
-        String lTemp = lDes.replaceAll(" ", "");
-        if (lTemp.length() == 0) {
-            return false;
-        }
-
-        return lDes.length() > 0;
+        return lDes.replaceAll("", "").length() > 0;
     }
 
 
     /**
      * To show a Toast message
      *
-     * @param pData
+     * @param pData custom message
      */
     private void showMessage(String pData) {
 
@@ -673,91 +492,5 @@ public class AddNotesActivity extends AppCompatActivity {
         mToast.show();
     }
 
-    /**
-     * Navigates to Main Activity
-     */
-    private void navigateToMain() {
 
-        Intent lIntent = new Intent();
-        setResult(DELETE_CODE, lIntent);
-        finish();
-    }
-
-    /**
-     * To perform delete
-     */
-    @SuppressLint("StaticFieldLeak")
-    class PerformDelete extends AsyncTask<Void, Void, Void> {
-
-
-        @Override
-        protected void onPreExecute() {
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (mID != -1) {
-                mNotesTable.deleteNotes(mID);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            mProgressBar.setVisibility(View.GONE);
-            navigateToMain();
-        }
-    }
-
-    /**
-     * To perform update
-     */
-
-    @SuppressLint("StaticFieldLeak")
-    class PerformUpdate extends AsyncTask<NotesModel, Void, Void> {
-
-
-        @Override
-        protected void onPreExecute() {
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(NotesModel... notesModels) {
-
-            mNotesTable.upDateNotes(notesModels[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            mProgressBar.setVisibility(View.GONE);
-        }
-    }
-
-    /**
-     * To Perform Insert
-     */
-    @SuppressLint("StaticFieldLeak")
-    class PerformInsert extends AsyncTask<NotesModel, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(NotesModel... notesModels) {
-            mID = mNotesTable.insertNote(notesModels[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aLong) {
-            mProgressBar.setVisibility(View.GONE);
-
-        }
-
-    }
 }

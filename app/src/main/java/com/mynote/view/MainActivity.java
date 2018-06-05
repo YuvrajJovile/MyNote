@@ -33,32 +33,41 @@ import static com.mynote.utils.Constants.CREATE;
 import static com.mynote.utils.Constants.CREATE_CODE;
 import static com.mynote.utils.Constants.CURRENT_POS;
 import static com.mynote.utils.Constants.EDIT_OR_CREATE_OR_DELETE;
-import static com.mynote.utils.Constants.ID_CREATE_OR_EDIT_OR_DELETE;
 import static com.mynote.utils.Constants.IN;
 import static com.mynote.utils.Constants.LANDSCAPE;
+import static com.mynote.utils.Constants.NOTES_DATA;
 import static com.mynote.utils.Constants.NOTES_LIST;
 import static com.mynote.utils.Constants.OUT;
 
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
-    private FloatingActionButton mFabAdd;
+
+    private TextView mAddNotesText;
+
+    private RelativeLayout mBlinkLayout;
+
+    private ImageView mAddNotesImageView;
+
+    private TextView mtvWelcome;
+
+    private RelativeLayout mBackgroundLay;
+
+    private RecyclerView mNotesRecycler;
+
+    private ProgressBar mProgressBar;
 
     private ArrayList<NotesModel> mNotesListData;
 
-
-    private RecyclerView mNotesRecycler;
     private NotesRecyclerAdapter mNotesRecyclerAdapter;
 
     private NotesTable mNotesTable;
-    private ProgressBar mProgressBar;
+
     private int mSelectedPos = -1;
 
-    private TextView mAddNotesText;
-    private RelativeLayout mBlinkLayout;
-    private ImageView mAddNotesImageView;
-    private TextView mtvWelcome;
-    private RelativeLayout mBackgroundLay;
+    private Toast mToast;
+
+    private boolean mFlagAddNotes = false;
 
 
     @Override
@@ -66,10 +75,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFabAdd = findViewById(R.id.v_fab_add);
+        FloatingActionButton lFabAdd = findViewById(R.id.v_fab_add);
         mNotesRecycler = findViewById(R.id.rv_notes);
         mProgressBar = findViewById(R.id.v_progress);
 
+        mToast = new Toast(this);
 
         mAddNotesText = findViewById(R.id.tv_add_notes);
         mBlinkLayout = findViewById(R.id.v_fab_lay);
@@ -77,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         mtvWelcome = findViewById(R.id.tv_welcome);
         mBackgroundLay = findViewById(R.id.v_background_lay);
 
-        mFabAdd.setOnClickListener(new View.OnClickListener() {
+        lFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 navigateToAddNotesActivity();
@@ -119,18 +129,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
 
-        upDateNotes();
+        if (!mFlagAddNotes) {
 
-        setWelcomeMessage();
+            upDateNotes();
 
-        setOrientation();
+            setWelcomeMessage();
 
-        stopAlarmIfRinging();
+            setOrientation();
+
+            stopAlarmIfRinging();
+        }
 
         super.onResume();
 
     }
 
+
+    /**
+     * Update the notes from DB
+     */
     private void upDateNotes() {
 
         if (mNotesListData == null)
@@ -141,6 +158,10 @@ public class MainActivity extends AppCompatActivity {
         new GetNotes().execute();
     }
 
+
+    /**
+     * Stops the alarm if it is ringing
+     */
     private void stopAlarmIfRinging() {
         RingToneManagerClass.getInstance().stopAlarm();
     }
@@ -198,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view, int pos) {
                     mSelectedPos = pos;
-                    navigateToEdit(mNotesListData.get(pos));
+                    navigateToEdit();
                     Log.d(this + "", "onClick is called");
                 }
 
@@ -219,21 +240,16 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Navigates to Add notes Activity to perform edit
-     *
-     * @param pData
      */
-    private void navigateToEdit(NotesModel pData) {
+    private void navigateToEdit() {
 
         Intent lIntent = new Intent(MainActivity.this, ShowNotesActivity.class);
         Bundle lBundle = new Bundle();
-        //lBundle.putString(EDIT_OR_CREATE_OR_DELETE, EDIT);
-        //lBundle.putParcelable(NOTES_DATA, pData);
-
         showLog("mSelectedPos==" + mSelectedPos);
         lBundle.putParcelableArrayList(NOTES_LIST, mNotesListData);
         lBundle.putInt(CURRENT_POS, mSelectedPos);
         lIntent.putExtras(lBundle);
-        startActivityForResult(lIntent, ID_CREATE_OR_EDIT_OR_DELETE);
+        startActivity(lIntent);
 
     }
 
@@ -245,16 +261,20 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Shows a Toast message
      *
-     * @param pData
+     * @param pData custom message
      */
     private void showMessage(String pData) {
-        Toast.makeText(this, pData, Toast.LENGTH_SHORT).show();
+        if (mToast != null)
+            mToast.cancel();
+        mToast = Toast.makeText(this, pData, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 
     /**
      * Navigate to Add notes Activity to add a new note
      */
     private void navigateToAddNotesActivity() {
+        mFlagAddNotes = true;
         Bundle lBundle = new Bundle();
         Intent lIntent = new Intent(this, AddNotesActivity.class);
         lBundle.putString(EDIT_OR_CREATE_OR_DELETE, CREATE);
@@ -274,58 +294,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        /*if (data != null) {
-
-
+        if (data != null && resultCode == CREATE_CODE) {
             Bundle lResultBundle = data.getExtras();
             NotesModel lNotesModel = null;
 
-
             if (lResultBundle != null) {
-
                 lNotesModel = lResultBundle.getParcelable(NOTES_DATA);
             }
 
 
-            if (resultCode == EDIT_CODE || resultCode == CREATE_CODE) {
-                if (resultCode == EDIT_CODE) {
-
-                    for (int i = 0; i < mNotesListData.size(); i++) {
-
-                        if (mNotesListData.get(i).getId() == lNotesModel.getId()) {
-                            mNotesListData.remove(i);
-                            break;
-                        }
-                    }
-
-                }
-
-
-                mNotesListData.add(0, lNotesModel);
-
-                //mNotesRecyclerAdapter.notifyDataSetChanged();
-               *//* if (createOrEdit.equals(EDIT)) {
-
-                    // mNotesRecyclerAdapter.notifyItemInserted(0);
-                    //mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
-                    //  mNotesRecyclerAdapter.notifyItemRangeRemoved(mSelectedPos, mNotesListData.size());
-                } else {
-                    //  mNotesRecyclerAdapter.notifyItemInserted(0);
-                    // mNotesRecyclerAdapter.notifyItemRangeChanged(0,mNotesListData.size());
-                    //mNotesRecyclerAdapter.notifyDataSetChanged();
-                }*//*
-
-
-            } else if (resultCode == DELETE_CODE) {
-                mNotesListData.remove(mSelectedPos);
-                //mNotesRecyclerAdapter.notifyDataSetChanged();
-                // mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
-                // mNotesRecyclerAdapter.notifyItemRangeChanged(mSelectedPos, mNotesRecyclerAdapter.getItemCount());
-            }
-
+            mNotesListData.add(0, lNotesModel);
             mNotesRecyclerAdapter.notifyDataSetChanged();
-            showAddNotesMessage();
-        }*/
+            new PerformInsert().execute(lNotesModel);
+
+            // mNotesRecyclerAdapter.notifyItemInserted(0);
+            //mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
+            //  mNotesRecyclerAdapter.notifyItemRangeRemoved(mSelectedPos, mNotesListData.size());
+
+            //  mNotesRecyclerAdapter.notifyItemInserted(0);
+            // mNotesRecyclerAdapter.notifyItemRangeChanged(0,mNotesListData.size());
+            //mNotesRecyclerAdapter.notifyDataSetChanged();
+
+
+        }
+        mNotesRecyclerAdapter.notifyDataSetChanged();
+        showAddNotesMessage();
+
     }
 
     /**
@@ -397,5 +391,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * To Perform Insert
+     */
+    class PerformInsert extends AsyncTask<NotesModel, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(NotesModel... notesModels) {
+            mNotesTable.insertNote(notesModels[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aLong) {
+            mProgressBar.setVisibility(View.GONE);
+
+        }
+
+    }
 
 }
