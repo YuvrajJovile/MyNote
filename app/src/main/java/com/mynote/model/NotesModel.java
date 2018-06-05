@@ -1,4 +1,4 @@
-package com.mynote.database.model;
+package com.mynote.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -21,11 +21,6 @@ public class NotesModel implements Parcelable {
     public NotesModel() {
     }
 
-    public NotesModel(String title, String description, String date) {
-        this.title = title;
-        this.description = description;
-        this.date = date;
-    }
 
     public NotesModel(long id, String title, String description,
                       String date, String color, String createdOrModified

@@ -20,26 +20,23 @@ import android.widget.Toast;
 
 import com.mynote.R;
 import com.mynote.adapter.NotesRecyclerAdapter;
-import com.mynote.adapter.listner.INotesRecyclerListener;
 import com.mynote.database.NotesTable;
-import com.mynote.database.model.NotesModel;
+import com.mynote.model.NotesModel;
 import com.mynote.utils.NotesApplication;
 import com.mynote.utils.RingToneManagerClass;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import static com.mynote.utils.Constants.COLOR_DEFAULT;
 import static com.mynote.utils.Constants.COLOR_GREY;
 import static com.mynote.utils.Constants.CREATE;
 import static com.mynote.utils.Constants.CREATE_CODE;
-import static com.mynote.utils.Constants.DELETE_CODE;
-import static com.mynote.utils.Constants.EDIT;
-import static com.mynote.utils.Constants.EDIT_CODE;
+import static com.mynote.utils.Constants.CURRENT_POS;
 import static com.mynote.utils.Constants.EDIT_OR_CREATE_OR_DELETE;
 import static com.mynote.utils.Constants.ID_CREATE_OR_EDIT_OR_DELETE;
 import static com.mynote.utils.Constants.IN;
 import static com.mynote.utils.Constants.LANDSCAPE;
-import static com.mynote.utils.Constants.NOTES_DATA;
+import static com.mynote.utils.Constants.NOTES_LIST;
 import static com.mynote.utils.Constants.OUT;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
     private FloatingActionButton mFabAdd;
 
-    private List<NotesModel> mNotesListData;
+    private ArrayList<NotesModel> mNotesListData;
 
 
     private RecyclerView mNotesRecycler;
@@ -63,13 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView mtvWelcome;
     private RelativeLayout mBackgroundLay;
 
-
-    private INotesRecyclerListener iNotesRecyclerListener = new INotesRecyclerListener() {
-        @Override
-        public void onClick(NotesModel data, int pos) {
-            //showAllert(data);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,22 +77,14 @@ public class MainActivity extends AppCompatActivity {
         mtvWelcome = findViewById(R.id.tv_welcome);
         mBackgroundLay = findViewById(R.id.v_background_lay);
 
-
-        init();
-
-    }
-
-
-    private void init() {
         mFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 navigateToAddNotesActivity();
             }
         });
-        mNotesListData = new ArrayList<>();
-        mNotesTable = new NotesTable(this);
-        new GetNotes().execute();
+
+
     }
 
 
@@ -137,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
 
-        Log.d(TAG, "Orientation Changed");
+        upDateNotes();
+
         setWelcomeMessage();
 
         setOrientation();
@@ -145,6 +128,17 @@ public class MainActivity extends AppCompatActivity {
         stopAlarmIfRinging();
 
         super.onResume();
+
+    }
+
+    private void upDateNotes() {
+
+        if (mNotesListData == null)
+            mNotesListData = new ArrayList<>();
+
+        mNotesListData.clear();
+        mNotesTable = new NotesTable(this);
+        new GetNotes().execute();
     }
 
     private void stopAlarmIfRinging() {
@@ -163,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
         if (lLoginFlag.isEmpty() || lLoginFlag.equals(OUT)
                 ) {
             mtvWelcome.setVisibility(View.VISIBLE);
+            mtvWelcome.setText(getString(R.string.welcome_message));
+            mtvWelcome.setTextColor(Color.parseColor(COLOR_DEFAULT));
             mAddNotesText.setVisibility(View.VISIBLE);
             mAddNotesImageView.setVisibility(View.VISIBLE);
             mBlinkLayout.setBackground(getDrawable(R.drawable.show_case_drawable));
@@ -196,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (mNotesRecyclerAdapter == null) {
-            mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotesListData, iNotesRecyclerListener);
+            mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotesListData);
             mNotesRecycler.setAdapter(mNotesRecyclerAdapter);
             NotesRecyclerAdapter.RecyclerTouchListener recyclerTouchListener = new NotesRecyclerAdapter.RecyclerTouchListener(MainActivity.this, mNotesRecycler, new NotesRecyclerAdapter.INotesClickListener() {
                 @Override
@@ -228,15 +224,21 @@ public class MainActivity extends AppCompatActivity {
      */
     private void navigateToEdit(NotesModel pData) {
 
-        Intent lIntent = new Intent(MainActivity.this, AddNotesActivity.class);
+        Intent lIntent = new Intent(MainActivity.this, ShowNotesActivity.class);
         Bundle lBundle = new Bundle();
-        lBundle.putString(EDIT_OR_CREATE_OR_DELETE, EDIT);
-        lBundle.putParcelable(NOTES_DATA, pData);
+        //lBundle.putString(EDIT_OR_CREATE_OR_DELETE, EDIT);
+        //lBundle.putParcelable(NOTES_DATA, pData);
+
+        showLog("mSelectedPos==" + mSelectedPos);
+        lBundle.putParcelableArrayList(NOTES_LIST, mNotesListData);
+        lBundle.putInt(CURRENT_POS, mSelectedPos);
         lIntent.putExtras(lBundle);
-
-
         startActivityForResult(lIntent, ID_CREATE_OR_EDIT_OR_DELETE);
 
+    }
+
+    private void showLog(String message) {
+        Log.d(TAG, message);
     }
 
 
@@ -272,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (data != null) {
+        /*if (data != null) {
 
 
             Bundle lResultBundle = data.getExtras();
@@ -302,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                 mNotesListData.add(0, lNotesModel);
 
                 //mNotesRecyclerAdapter.notifyDataSetChanged();
-               /* if (createOrEdit.equals(EDIT)) {
+               *//* if (createOrEdit.equals(EDIT)) {
 
                     // mNotesRecyclerAdapter.notifyItemInserted(0);
                     //mNotesRecyclerAdapter.notifyItemRemoved(mSelectedPos);
@@ -311,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
                     //  mNotesRecyclerAdapter.notifyItemInserted(0);
                     // mNotesRecyclerAdapter.notifyItemRangeChanged(0,mNotesListData.size());
                     //mNotesRecyclerAdapter.notifyDataSetChanged();
-                }*/
+                }*//*
 
 
             } else if (resultCode == DELETE_CODE) {
@@ -323,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
 
             mNotesRecyclerAdapter.notifyDataSetChanged();
             showAddNotesMessage();
-        }
+        }*/
     }
 
     /**
@@ -394,4 +396,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 }

@@ -23,4 +23,5 @@
     <string name="remainder_canceled">Remainder Canceled</string>
     <string name="remainder_set">Remainder Set</string>
     <string name="note_deleted">Note Deleted</string>
+    <string name="title_activity_show_notes">ShowNotesActivity</string>
 </resources>

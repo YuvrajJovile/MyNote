@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.mynote.database.model.NotesModel;
+import com.mynote.model.NotesModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +175,7 @@ public class NotesTable {
         SQLiteDatabase db = mDBhelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        //values.put(COLUMN_ID, pNotesModel.getId());
         values.put(COLUMN_NOTE_TITLE, pNotesModel.getTitle());
         values.put(COLUMN_NOTE_DESCRIPTION, pNotesModel.getDescription());
         values.put(COLUMN_TIMESTAMP, pNotesModel.getDate());
@@ -186,6 +187,10 @@ public class NotesTable {
         String selection = COLUMN_ID + " = ? ";
         String[] selectionArgs = {pNotesModel.getId() + ""};
         db.update(TABLE_NAME, values, selection, selectionArgs);
+
+
+        //db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        //db.insert(TABLE_NAME, null, values);
         db.close();
 
 

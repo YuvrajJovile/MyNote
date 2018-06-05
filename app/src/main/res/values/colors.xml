@@ -20,7 +20,9 @@
     <color name="colorGreenLight81C784">#81C784</color>
     <color name="colorVioletBA68C8">#BA68C8</color>
     <color name="colorPinkF06292">#F06292</color>
-    <color name="colorOrrange">#FF8A65</color>
+    <color name="colorOrange">#FF8A65</color>
+
+    <color name="colorPaleWhite">#90fffdd0</color>
 
 
 </resources>

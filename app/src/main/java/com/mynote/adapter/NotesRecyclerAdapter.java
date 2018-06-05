@@ -14,33 +14,31 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mynote.R;
-import com.mynote.adapter.listner.INotesRecyclerListener;
-import com.mynote.database.model.NotesModel;
+import com.mynote.model.NotesModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import static com.mynote.utils.Constants.MODIFIED;
 
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.NotesRecyclerViewHolder> {
 
-    private List<NotesModel> mDataList;
-    private INotesRecyclerListener mINotesRecyclerListener;
+    private ArrayList<NotesModel> mDataList;
 
-    public NotesRecyclerAdapter(List<NotesModel> pDataList, INotesRecyclerListener pINotesRecyclerListener) {
+
+    public NotesRecyclerAdapter(ArrayList<NotesModel> pDataList) {
         this.mDataList = pDataList;
-        this.mINotesRecyclerListener = pINotesRecyclerListener;
     }
 
     @NonNull
     @Override
     public NotesRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        NotesRecyclerViewHolder lNotesRecyclerViewHolder = new NotesRecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.inflate_list_item, parent, false), mINotesRecyclerListener);
+        NotesRecyclerViewHolder lNotesRecyclerViewHolder = new NotesRecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.inflate_list_item, parent, false));
         lNotesRecyclerViewHolder.setIsRecyclable(false);
 
         return lNotesRecyclerViewHolder;
@@ -117,14 +115,14 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     public class NotesRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private NotesModel mNotesModel;
-        private INotesRecyclerListener mINotesRecyclerListener;
+
         private TextView tvTitle, tvDescription;
         private TextView tvDate;
         private CardView mLayout;
 
-        private NotesRecyclerViewHolder(View itemView, INotesRecyclerListener pINotesRecyclerListener) {
+        private NotesRecyclerViewHolder(View itemView) {
             super(itemView);
-            this.mINotesRecyclerListener = pINotesRecyclerListener;
+
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvDescription = itemView.findViewById(R.id.tv_description);
             tvDate = itemView.findViewById(R.id.tv_date);
@@ -176,7 +174,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.v_layout:
-                    mINotesRecyclerListener.onClick(mNotesModel, getAdapterPosition());
+
                     break;
             }
         }

@@ -18,6 +18,8 @@ public class Constants {
     public static int DELETE_CODE = 202;
 
     public static String EDIT_OR_CREATE_OR_DELETE = "edit_or_create_del";
+    public static String NOTES_LIST = "notes_list";
+    public static String CURRENT_POS = "current_pos";
 
 
     public static String NOTES_DATA = "notes_data";
@@ -38,6 +40,7 @@ public class Constants {
 
     public static String COLOR_DEFAULT = "#ffffff";
 
+    public static String COLOR_RED = "#f44336";
     public static String COLOR_GREEN = "#4DB6AC";
     public static String COLOR_GREEN_LIGHT = "#81C784";
     public static String COLOR_BLUE = "#4DD0E1";
@@ -51,6 +54,9 @@ public class Constants {
 
 
     public static int LANDSCAPE = 2;
+
+    public static String TITLE_DATA = "title_data";
+    public static String DES_DATA = "des_data";
 
 
 }

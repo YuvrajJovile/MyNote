@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.mynote.R;
 import com.mynote.broadcast.RemainderBroadcast;
 import com.mynote.database.NotesTable;
-import com.mynote.database.model.NotesModel;
+import com.mynote.model.NotesModel;
 import com.mynote.utils.RingToneManagerClass;
 
 import java.text.ParseException;
@@ -56,6 +56,8 @@ import static com.mynote.utils.Constants.NOTES_DATA;
 public class AddNotesActivity extends AppCompatActivity {
 
     private EditText mEtTitle, mEtDescription;
+
+    private final String TAG = getClass().getSimpleName();
 
     private ImageButton mIbDelete, mIbFavorites, mIbRemainder, mIbShare;
 
@@ -104,6 +106,7 @@ public class AddNotesActivity extends AppCompatActivity {
         mRgColorGroup = findViewById(R.id.rg_color_group);
         mTvCardColor = findViewById(R.id.tv_card_color);
 
+
         init();
 
     }
@@ -126,6 +129,7 @@ public class AddNotesActivity extends AppCompatActivity {
 
         final Bundle lBundle = getIntent().getExtras();
         if (lBundle != null) {
+
 
             mFlagEditOrCreate = lBundle.getString(EDIT_OR_CREATE_OR_DELETE);
 
@@ -217,7 +221,6 @@ public class AddNotesActivity extends AppCompatActivity {
                 String lModifiedTitle = ((mNotesModel.getCreatedOrModified().equals(MODIFIED)) ? getString(R.string.last_modified) : getString(R.string.created_at)) + lDateString;
                 mtvDateModified.setText(lModifiedTitle);
 
-                mID = mNotesModel.getId();
                 Log.d(this + "", "id==" + mID);
             } else {
                 mNotesModel = new NotesModel();
@@ -357,6 +360,11 @@ public class AddNotesActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void showLog(String pMessage) {
+
+        Log.d(TAG, pMessage);
     }
 
 
